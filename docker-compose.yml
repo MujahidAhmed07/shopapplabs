@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  socialcheck:
+    build: .
+    container_name: socialcheck
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
