@@ -642,23 +642,34 @@ def add_security_and_seo_headers(response):
         response.headers['Cache-Control'] = 'public, max-age=3600'
     return response
 
+@app.route('/favicon.ico')
+def favicon():
+    from flask import Response
+    svg_icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">⚡</text></svg>'
+    return Response(svg_icon, mimetype='image/svg+xml')
+
 @app.route('/sitemap.xml')
 def sitemap():
-    from flask import Response, send_from_directory
+    from flask import Response
     import os
     sitemap_path = os.path.join(os.path.dirname(__file__), 'sitemap.xml')
-    with open(sitemap_path, 'r') as f:
-        content = f.read()
-    return Response(content, mimetype='application/xml')
+    if os.path.exists(sitemap_path):
+        with open(sitemap_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        return Response(content, mimetype='application/xml')
+    return Response("Not found", status=404)
 
 @app.route('/robots.txt')
 def robots():
     from flask import Response
     import os
     robots_path = os.path.join(os.path.dirname(__file__), 'robots.txt')
-    with open(robots_path, 'r') as f:
-        content = f.read()
-    return Response(content, mimetype='text/plain')
+    if os.path.exists(robots_path):
+        with open(robots_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        return Response(content, mimetype='text/plain')
+    return Response("Not found", status=404)
+
 
 def clean_input_username(raw):
     if not raw:
