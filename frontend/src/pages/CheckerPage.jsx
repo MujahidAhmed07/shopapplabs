@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Search, Loader2, RefreshCw, ExternalLink, Check, Copy, Sparkles, Share2 } from 'lucide-react';
 import GlassCard from '../components/common/GlassCard';
 import ResultBadge from '../components/common/ResultBadge';
+import SeoFaq from '../components/common/SeoFaq';
 import { PLATFORMS_CONFIG, CATEGORIES } from '../config/platforms';
 import { checkSinglePlatform } from '../services/apiClient';
 
@@ -107,7 +108,7 @@ export default function CheckerPage() {
   const takenCount = Object.values(results).filter((r) => r.status === 'TAKEN').length;
 
   return (
-    <div className="max-w-7xl mx-auto py-10 px-6 space-y-10">
+    <div className="max-w-7xl mx-auto py-10 px-6 space-y-12">
       
       {/* Header */}
       <div className="text-center space-y-3">
@@ -288,6 +289,9 @@ export default function CheckerPage() {
           );
         })}
       </div>
+
+      {/* SEO FAQ & Keyword Content Section */}
+      <SeoFaq />
 
     </div>
   );

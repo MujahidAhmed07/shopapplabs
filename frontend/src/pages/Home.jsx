@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Zap, Shield, Sparkles, ArrowRight, CheckCircle2, Globe, Layers, Cpu } from 'lucide-react';
 import GlassCard from '../components/common/GlassCard';
+import SeoFaq from '../components/common/SeoFaq';
 import { PRODUCTS_CATALOG } from '../config/products';
 
 export default function Home() {
@@ -161,6 +162,9 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      {/* SEO FAQ & Content Block */}
+      <SeoFaq />
 
     </div>
   );
