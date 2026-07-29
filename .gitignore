@@ -1,8 +1,17 @@
+# Python
 __pycache__/
 *.pyc
 .env
 .venv/
 env/
 venv/
+
+# Node / JS
+node_modules/
+dist/
+.vite/
+
+# Archives & OS
 *.zip
 .DS_Store
+Thumbs.db
