@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Zap, Search, ShoppingBag, Grid, ExternalLink } from 'lucide-react';
+import { Zap, Search, ShoppingBag, Layers, ExternalLink } from 'lucide-react';
 
 export default function Navbar() {
   const location = useLocation();
@@ -50,6 +50,17 @@ export default function Navbar() {
             Username Checker
           </Link>
           <Link
+            to="/platforms"
+            className={`px-4 py-2 rounded-full text-sm font-medium flex items-center gap-1.5 transition-all ${
+              isActive('/platforms') 
+                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20' 
+                : 'text-slate-300 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Layers className="w-4 h-4" />
+            Supported Platforms
+          </Link>
+          <Link
             to="/products"
             className={`px-4 py-2 rounded-full text-sm font-medium flex items-center gap-1.5 transition-all ${
               isActive('/products') 
@@ -58,7 +69,7 @@ export default function Navbar() {
             }`}
           >
             <ShoppingBag className="w-4 h-4" />
-            Products & Apps
+            Products
           </Link>
         </nav>
 

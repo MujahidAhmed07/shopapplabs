@@ -26,24 +26,28 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Quick Links */}
+        {/* Dedicated Platform Checkers (SEO Indexing Links) */}
         <div>
-          <h4 className="font-semibold text-white text-sm uppercase tracking-wider mb-4">Products & Tools</h4>
-          <ul className="space-y-2.5 text-sm text-slate-400">
-            <li><Link to="/checker" className="hover:text-indigo-400 transition-colors">Username Checker Pro</Link></li>
-            <li><Link to="/products" className="hover:text-indigo-400 transition-colors">SEO Audit Engine</Link></li>
-            <li><Link to="/products" className="hover:text-indigo-400 transition-colors">UI Kits & Templates</Link></li>
-            <li><Link to="/products" className="hover:text-indigo-400 transition-colors">Developer APIs</Link></li>
+          <h4 className="font-semibold text-white text-sm uppercase tracking-wider mb-4">Platform Checkers</h4>
+          <ul className="space-y-2 text-xs text-slate-400">
+            <li><Link to="/instagram-username-checker" className="hover:text-indigo-400 transition-colors">Instagram Handle Checker</Link></li>
+            <li><Link to="/tiktok-username-checker" className="hover:text-indigo-400 transition-colors">TikTok Username Checker</Link></li>
+            <li><Link to="/youtube-username-checker" className="hover:text-indigo-400 transition-colors">YouTube Handle Search</Link></li>
+            <li><Link to="/twitter-username-checker" className="hover:text-indigo-400 transition-colors">X (Twitter) Handle Check</Link></li>
+            <li><Link to="/github-username-checker" className="hover:text-indigo-400 transition-colors">GitHub Account Checker</Link></li>
+            <li><Link to="/domain-availability-checker" className="hover:text-indigo-400 transition-colors">Domain Name (.COM) Lookup</Link></li>
+            <li><Link to="/platforms" className="hover:text-indigo-400 transition-colors text-indigo-400 font-semibold">View All 100+ Platforms →</Link></li>
           </ul>
         </div>
 
-        {/* Legal & Info */}
+        {/* Quick Links & Products */}
         <div>
-          <h4 className="font-semibold text-white text-sm uppercase tracking-wider mb-4">ShopApp Labs</h4>
-          <ul className="space-y-2.5 text-sm text-slate-400">
+          <h4 className="font-semibold text-white text-sm uppercase tracking-wider mb-4">Products & Tools</h4>
+          <ul className="space-y-2 text-xs text-slate-400">
+            <li><Link to="/checker" className="hover:text-indigo-400 transition-colors">Username Checker Pro</Link></li>
+            <li><Link to="/products" className="hover:text-indigo-400 transition-colors">SEO Audit Engine</Link></li>
+            <li><Link to="/products" className="hover:text-indigo-400 transition-colors">UI Kits & Templates</Link></li>
             <li><Link to="/" className="hover:text-indigo-400 transition-colors flex items-center gap-1">Platform Home <Globe className="w-3.5 h-3.5" /></Link></li>
-            <li><span className="text-slate-500">Version 2.0 (React + Flask)</span></li>
-            <li><span className="text-slate-500">cPanel Optimized WSGI</span></li>
           </ul>
         </div>
 
