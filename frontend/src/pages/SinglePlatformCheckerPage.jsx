@@ -225,8 +225,8 @@ export default function SinglePlatformCheckerPage() {
         </ul>
       </GlassCard>
 
-      {/* SEO FAQ */}
-      <SeoFaq />
+      {/* SEO FAQ — Platform Specific, unique per page */}
+      <SeoFaq platformKey={key} platformName={platformMeta.name} />
 
     </div>
   );

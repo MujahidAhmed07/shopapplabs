@@ -7,8 +7,7 @@ from api.products.routes import products_bp
 
 def create_app():
     static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
-    # Set static_url_path='/static' so non-static paths like /checker fall through to SPA route
-    app = Flask(__name__, static_folder=static_dir, static_url_path='/static')
+    app = Flask(__name__, static_folder=static_dir, static_url_path='')
     
     app.config.from_object(Config)
     
@@ -17,7 +16,7 @@ def create_app():
 
     # Register API Blueprints
     app.register_blueprint(checker_bp, url_prefix='/api/v1/checker')
-    app.register_blueprint(checker_bp, url_prefix='/api/check', name='checker_legacy') # Backward compatibility
+    app.register_blueprint(checker_bp, url_prefix='/api/check', name='checker_legacy')
     app.register_blueprint(products_bp, url_prefix='/api/v1/products')
 
     @app.after_request
@@ -48,15 +47,21 @@ def create_app():
                 return Response(f.read(), mimetype='text/plain')
         return Response("Not found", status=404)
 
-    # SPA Fallback route: serve index.html for all non-API routes (/checker, /products, etc.)
-    @app.route('/', defaults={'path': ''})
-    @app.route('/<path:path>')
-    def serve_spa(path):
-        if path and os.path.exists(os.path.join(app.static_folder, path)):
-            return send_from_directory(app.static_folder, path)
+    @app.route('/')
+    def serve_root():
         index_path = os.path.join(app.static_folder, 'index.html')
         if os.path.exists(index_path):
-            return send_from_directory(app.static_folder, 'index.html')
+            return send_from_directory(app.static_folder, 'index.html'), 200
+        return jsonify({"message": "ShopApp Labs Backend API is Running", "version": "2.0"}), 200
+
+    # Catch 404 for SPA Client Routes and serve index.html with HTTP status 200
+    @app.errorhandler(404)
+    def handle_spa_fallback(e):
+        if request.path.startswith('/api/'):
+            return jsonify({"error": "API route not found"}), 404
+        index_path = os.path.join(app.static_folder, 'index.html')
+        if os.path.exists(index_path):
+            return send_from_directory(app.static_folder, 'index.html'), 200
         return jsonify({"message": "ShopApp Labs Backend API is Running", "version": "2.0"}), 200
 
     return app

@@ -195,9 +195,9 @@ export default function CheckerPage() {
               <span>Checking platforms...</span>
               <span>{progress}%</span>
             </div>
-            <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+            <div className="w-full bg-slate-800/80 rounded-full h-1.5 overflow-hidden">
               <div
-                className="bg-gradient-to-r from-indigo-500 to-cyan-400 h-full transition-all duration-300"
+                className="progress-bar-animated h-full rounded-full transition-[width] duration-300 ease-out"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -211,10 +211,11 @@ export default function CheckerPage() {
               <button
                 key={cat.id}
                 onClick={() => handleCategoryChange(cat.id)}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                style={{ transition: 'background 0.22s cubic-bezier(0.4,0,0.2,1), color 0.18s, box-shadow 0.22s, transform 0.18s cubic-bezier(0.34,1.56,0.64,1)' }}
+                className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap ${
                   activeCategory === cat.id
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
-                    : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/30 scale-105'
+                    : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 hover:scale-102'
                 }`}
               >
                 {cat.label}
