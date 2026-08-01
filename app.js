@@ -37,6 +37,26 @@ app.prepare().then(() => {
   createServer(async (req, res) => {
     try {
       const parsedUrl = parse(req.url, true);
+      const pathname = parsedUrl.pathname || '';
+
+      // Direct fallback stream handler for /_next/static/ requests to guarantee CSS & JS loading in cPanel
+      if (pathname.startsWith('/_next/static/')) {
+        const relativePath = pathname.replace('/_next/static/', '');
+        const filePath = path.join(__dirname, '.next', 'static', relativePath);
+        if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+          const ext = path.extname(filePath);
+          let contentType = 'application/octet-stream';
+          if (ext === '.css') contentType = 'text/css';
+          else if (ext === '.js') contentType = 'application/javascript';
+          else if (ext === '.json') contentType = 'application/json';
+          else if (ext === '.woff2') contentType = 'font/woff2';
+          
+          res.setHeader('Content-Type', contentType);
+          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+          return fs.createReadStream(filePath).pipe(res);
+        }
+      }
+
       await handle(req, res, parsedUrl);
     } catch (err) {
       console.error('Error occurred handling', req.url, err);

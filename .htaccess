@@ -5,9 +5,19 @@
     PassengerEnabled on
 </IfModule>
 
-# Forward all requests (including /_next/ static assets) to Node.js / Passenger
+# Allow public web access to .next/static directory
+<DirectoryMatch "^.*/\.next/static">
+    Options +FollowSymLinks
+    Require all granted
+</DirectoryMatch>
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
+
+    # Directly map /_next/static/ requests to .next/static/ for instant Apache CSS/JS serving
+    RewriteRule ^_next/static/(.*)$ .next/static/$1 [L]
+
+    # Forward all other requests to Next.js app.js
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)$ app.js [QSA,L]
