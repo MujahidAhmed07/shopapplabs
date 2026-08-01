@@ -1,0 +1,15 @@
+# DO NOT REMOVE OR MODIFY. CLOUDLINUX PASSENGER CONFIGURATION
+# Note: cPanel generates this file automatically when you click Save/Restart in "Setup Node.js App".
+
+<IfModule mod_passenger.c>
+    PassengerAppType node
+    PassengerStartupFile server.js
+</IfModule>
+
+# Fallback Apache Proxy Rewrite Rules if Passenger module is disabled
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ server.js [QSA,L]
+</IfModule>
