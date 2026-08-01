@@ -1,15 +1,14 @@
-# DO NOT REMOVE OR MODIFY. CLOUDLINUX PASSENGER CONFIGURATION
-# Note: cPanel generates this file automatically when you click Save/Restart in "Setup Node.js App".
-
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION
 <IfModule mod_passenger.c>
     PassengerAppType node
-    PassengerStartupFile server.js
+    PassengerStartupFile app.js
 </IfModule>
 
-# Fallback Apache Proxy Rewrite Rules if Passenger module is disabled
+# Allow public web access to static assets
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ server.js [QSA,L]
+
+    # Allow direct access to _next static CSS & JS bundles
+    RewriteCond %{REQUEST_URI} ^/_next/static/
+    RewriteRule ^_next/static/(.*)$ _next/static/$1 [L]
 </IfModule>
