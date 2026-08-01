@@ -2,10 +2,31 @@ import { createServer } from 'http';
 import { parse } from 'url';
 import next from 'next';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Recursively fix directory & file permissions on .next to prevent Linux cPanel EACCES errors
+function fixNextPermissions(dir) {
+  try {
+    if (!fs.existsSync(dir)) return;
+    try { fs.chmodSync(dir, 0o755); } catch (e) {}
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        fixNextPermissions(fullPath);
+      } else {
+        try { fs.chmodSync(fullPath, 0o644); } catch (e) {}
+      }
+    }
+  } catch (e) {}
+}
+
+const nextDir = path.join(__dirname, '.next');
+fixNextPermissions(nextDir);
 
 const dev = false;
 const app = next({ dev, dir: __dirname });
