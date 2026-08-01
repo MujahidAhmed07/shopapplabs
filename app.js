@@ -2,7 +2,8 @@ import { createServer } from 'http';
 import { parse } from 'url';
 import next from 'next';
 
-const dev = process.env.NODE_ENV === 'development';
+// Force production mode to prevent cPanel dev file-watcher permission errors (EACCES)
+const dev = false;
 const app = next({ dev });
 const handle = app.getRequestHandler();
 const port = process.env.PORT || 3000;
