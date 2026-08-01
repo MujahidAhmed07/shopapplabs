@@ -1,10 +1,14 @@
 import { createServer } from 'http';
 import { parse } from 'url';
 import next from 'next';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// Force production mode to prevent cPanel dev file-watcher permission errors (EACCES)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const dev = false;
-const app = next({ dev });
+const app = next({ dev, dir: __dirname });
 const handle = app.getRequestHandler();
 const port = process.env.PORT || 3000;
 
