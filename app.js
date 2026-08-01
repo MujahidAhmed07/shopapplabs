@@ -25,21 +25,8 @@ function fixNextPermissions(dir) {
   } catch (e) {}
 }
 
-// Auto-sync .next/static to _next/static so Apache serves CSS/JS assets without dot-folder access blocks
-function syncPublicStaticAssets() {
-  try {
-    const src = path.join(__dirname, '.next', 'static');
-    const dest = path.join(__dirname, '_next', 'static');
-    if (fs.existsSync(src)) {
-      fs.mkdirSync(path.dirname(dest), { recursive: true });
-      fs.cpSync(src, dest, { recursive: true });
-    }
-  } catch (e) {}
-}
-
 const nextDir = path.join(__dirname, '.next');
 fixNextPermissions(nextDir);
-syncPublicStaticAssets();
 
 const dev = false;
 const app = next({ dev, dir: __dirname });

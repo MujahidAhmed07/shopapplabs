@@ -2,13 +2,13 @@
 <IfModule mod_passenger.c>
     PassengerAppType node
     PassengerStartupFile app.js
+    PassengerEnabled on
 </IfModule>
 
-# Allow public web access to static assets
+# Forward all requests (including /_next/ static assets) to Node.js / Passenger
 <IfModule mod_rewrite.c>
     RewriteEngine On
-
-    # Allow direct access to _next static CSS & JS bundles
-    RewriteCond %{REQUEST_URI} ^/_next/static/
-    RewriteRule ^_next/static/(.*)$ _next/static/$1 [L]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ app.js [QSA,L]
 </IfModule>
