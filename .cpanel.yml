@@ -3,3 +3,5 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home/aljadeedelectric/shopapplabs.com
     - /bin/cp -R * $DEPLOYPATH
+    - cd $DEPLOYPATH && npm install --production && npm run build
+    - touch $DEPLOYPATH/tmp/restart.txt

@@ -1,11 +1,12 @@
 version: '3.8'
 
 services:
-  socialcheck:
+  username-checker:
     build: .
-    container_name: socialcheck
+    container_name: username-checker-node
     ports:
       - "5000:5000"
     restart: unless-stopped
     environment:
-      - PYTHONUNBUFFERED=1
+      - PORT=5000
+      - NODE_ENV=production

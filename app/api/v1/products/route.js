@@ -1,0 +1,15 @@
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+  return NextResponse.json({
+    products: [
+      {
+        id: 'username-checker-pro',
+        name: 'Username Checker Pro',
+        tagline: 'Real-time handle availability checker for 100+ platforms & TLDs',
+        status: 'active',
+        type: 'saas_tool'
+      }
+    ]
+  });
+}

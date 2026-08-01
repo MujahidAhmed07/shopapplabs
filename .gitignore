@@ -1,15 +1,18 @@
-# Python
+# Dependencies & Build Output
+node_modules/
+.next/
+dist/
+out/
+build/
+.vite/
+
+# Python leftovers
 __pycache__/
 *.pyc
 .env
 .venv/
 env/
 venv/
-
-# Node / JS
-node_modules/
-dist/
-.vite/
 
 # Archives & OS
 *.zip

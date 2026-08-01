@@ -1,19 +1,20 @@
-# Use slim Python image for small container size
-FROM python:3.11-slim
+FROM node:20-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Install dependencies first (cached layer)
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy root and backend packages
+COPY package.json ./
+COPY backend/package.json ./backend/
 
-# Copy app files
-COPY app.py .
-COPY templates/ templates/
+# Install backend dependencies
+RUN npm --prefix backend install --production
 
-# Expose port
+# Copy backend source code
+COPY backend ./backend
+
 EXPOSE 5000
 
-# Run with gunicorn (production-ready)
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--timeout", "60", "app:app"]
+ENV PORT=5000
+ENV NODE_ENV=production
+
+CMD ["node", "backend/src/server.js"]
