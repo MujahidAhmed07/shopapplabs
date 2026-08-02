@@ -4,7 +4,7 @@ dist/
 out/
 build/
 .vite/
-.next/
+.next/cache/
 *.nft.json
 
 # Python leftovers
