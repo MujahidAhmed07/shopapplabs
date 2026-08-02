@@ -10,7 +10,7 @@ Built by **ShopApp Labs**.
 
 - 🌐 **100+ Supported Platforms**: Check handles on Instagram, TikTok, X (Twitter), YouTube, GitHub, Twitch, Snapchat, Reddit, Pinterest, Spotify, Steam, and 100+ services.
 - 🌐 **Domain Name Search**: Live DNS & WHOIS availability checks for `.com`, `.io`, `.dev`, `.co`, `.net`, `.org`.
-- ⚡ **Real-Time Live Search**: Debounced instant as-you-type search streaming.
+- ⚡ **Real-Time Live Search**: Instant handle search with API status checking.
 - 📱 **Mobile-First Responsive Design**: 5-column CSS grid with mobile drawer navigation and tab badges.
 - 🔍 **Enterprise SEO & AEO**: Full Schema.org JSON-LD structured data (`WebApplication`, `FAQPage`, `HowTo`, `BreadcrumbList`, `Speakable`, `SiteLinksSearchBox`).
 
@@ -20,29 +20,31 @@ Built by **ShopApp Labs**.
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/shopapp-labs-username-checker.git
-   cd shopapp-labs-username-checker
+   git clone https://github.com/MujahidAhmed07/shopapplabs.git
+   cd shopapplabs
    ```
 
 2. **Install dependencies:**
    ```bash
-   pip install -r requirements.txt
+   npm install
    ```
 
 3. **Run the local dev server:**
    ```bash
-   python app.py
+   npm run dev
    ```
-   Open `http://127.0.0.1:5000` in your browser.
+   Open `http://localhost:3000` in your browser.
 
 ---
 
-## 🌐 Production Deployment (cPanel WSGI)
+## 🌐 Production Deployment (cPanel CloudLinux Passenger)
 
-- **Entry Point File**: `passenger_wsgi.py`
-- **Application Object**: `application`
-- Serves static assets, `sitemap.xml`, and `robots.txt` automatically.
+- **Node.js Version**: 18.x or 20.x
+- **Application Startup File**: `app.js`
+- **Passenger Configuration**: Handled via `.htaccess` (`PassengerStartupFile app.js`)
+- Serves static assets, Next.js chunks, `sitemap.xml`, and `robots.txt` automatically.
 
 ---
 
-© 2026 **ShopApp Labs** (`shopapplab.com`). All rights reserved.
+© 2026 **ShopApp Labs** (`shopapplabs.com`). All rights reserved.
+
