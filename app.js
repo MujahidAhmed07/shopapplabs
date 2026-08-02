@@ -13,7 +13,18 @@ const logFilePath = path.join(__dirname, 'server.log');
 
 function writeToLog(type, ...args) {
   const time = new Date().toISOString();
-  const message = args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ');
+  const message = args.map(a => {
+    if (a instanceof Error) return a.stack || `${a.name}: ${a.message}`;
+    if (typeof a === 'object' && a !== null) {
+      try {
+        const str = JSON.stringify(a);
+        return str === '{}' ? (a.message || a.toString()) : str;
+      } catch (e) {
+        return String(a);
+      }
+    }
+    return String(a);
+  }).join(' ');
   const logLine = `[${time}] [${type}] ${message}\n`;
   try {
     fs.appendFileSync(logFilePath, logLine);
