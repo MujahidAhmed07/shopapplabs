@@ -1,13 +1,9 @@
-import { createServer } from 'http';
-import { parse } from 'url';
-import next from 'next';
-import path from 'path';
-import fs from 'fs';
-import util from 'util';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const { createServer } = require('http');
+const { parse } = require('url');
+const next = require('next');
+const path = require('path');
+const fs = require('fs');
+const util = require('util');
 
 // File logging helper for cPanel environment
 const logFilePath = path.join(__dirname, 'server.log');
@@ -58,7 +54,6 @@ writeToLog('INFO', '=== Server Process Started ===');
 writeToLog('INFO', `Node version: ${process.version}, Platform: ${process.platform}`);
 writeToLog('INFO', `Current directory: ${__dirname}`);
 
-
 // Fast lightweight permission check for top-level folders
 try { if (fs.existsSync(path.join(__dirname, '.next'))) fs.chmodSync(path.join(__dirname, '.next'), 0o755); } catch (e) {}
 try { if (fs.existsSync(path.join(__dirname, 'public'))) fs.chmodSync(path.join(__dirname, 'public'), 0o755); } catch (e) {}
@@ -67,7 +62,6 @@ const dev = false;
 const app = next({ dev, dir: __dirname });
 const handle = app.getRequestHandler();
 const port = process.env.PORT || 3000;
-
 
 app.prepare().then(() => {
   createServer(async (req, res) => {
@@ -182,5 +176,3 @@ app.prepare().then(() => {
   console.error(ex.stack);
   process.exit(1);
 });
-
-

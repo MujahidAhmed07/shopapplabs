@@ -2,10 +2,9 @@
   "name": "username-checker-next",
   "version": "2.0.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build && node -e \"import fs from 'fs'; try { const p='.next/server/server-reference-manifest.json'; if(fs.existsSync(p)){ const d=JSON.parse(fs.readFileSync(p)); d.encryptionKey='0000000000000000000000000000000000000000000='; fs.writeFileSync(p, JSON.stringify(d)); } } catch(e){}\"",
+    "build": "next build && node -e \"const fs=require('fs'); try { const p='.next/server/server-reference-manifest.json'; if(fs.existsSync(p)){ const d=JSON.parse(fs.readFileSync(p)); d.encryptionKey='0000000000000000000000000000000000000000000='; fs.writeFileSync(p, JSON.stringify(d)); } } catch(e){}\"",
     "start": "next start",
     "lint": "next lint"
   },
