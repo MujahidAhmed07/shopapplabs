@@ -61,6 +61,13 @@ app.prepare().then(() => {
         }
       }
 
+      // Set no-cache for HTML pages so browsers always fetch fresh HTML with current asset hashes
+      if (!pathname.startsWith('/_next/') && !pathname.startsWith('/api/')) {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+      }
+
       await handle(req, res, parsedUrl);
     } catch (err) {
       console.error('Error occurred handling', req.url, err);

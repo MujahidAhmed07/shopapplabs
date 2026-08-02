@@ -2,6 +2,11 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/aljadeedelectric/uchecker
-    - /bin/cp -R .next .htaccess * $DEPLOYPATH 2>/dev/null || true
+    - rm -rf $DEPLOYPATH/.next
+    - /bin/cp -R .next $DEPLOYPATH/
+    - /bin/cp -R .htaccess $DEPLOYPATH/ 2>/dev/null || true
+    - /bin/cp -R * $DEPLOYPATH/ 2>/dev/null || true
+    - mkdir -p $DEPLOYPATH/tmp
     - touch $DEPLOYPATH/tmp/restart.txt
+
 
