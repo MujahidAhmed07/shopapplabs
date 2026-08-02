@@ -41,6 +41,11 @@ process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
+writeToLog('INFO', '=== Server Process Started ===');
+writeToLog('INFO', `Node version: ${process.version}, Platform: ${process.platform}`);
+writeToLog('INFO', `Current directory: ${__dirname}`);
+
+
 // Recursively fix directory & file permissions on .next & public to prevent Linux cPanel EACCES errors
 function fixPermissions(dir) {
   try {
