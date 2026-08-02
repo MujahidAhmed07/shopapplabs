@@ -36,7 +36,7 @@ const port = process.env.PORT || 3000;
 app.prepare().then(() => {
   createServer(async (req, res) => {
     try {
-      const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+      const parsedUrl = parse(req.url, true);
       const pathname = parsedUrl.pathname || '';
 
       // Direct fallback stream handler for /_next/static/ requests to guarantee CSS & JS loading in cPanel
@@ -57,7 +57,7 @@ app.prepare().then(() => {
         }
       }
 
-      await handle(req, res, { pathname: parsedUrl.pathname, query: Object.fromEntries(parsedUrl.searchParams) });
+      await handle(req, res, parsedUrl);
     } catch (err) {
       console.error('Error occurred handling', req.url, err);
       res.statusCode = 500;
