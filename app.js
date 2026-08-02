@@ -3,6 +3,7 @@ import { parse } from 'url';
 import next from 'next';
 import path from 'path';
 import fs from 'fs';
+import util from 'util';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -16,15 +17,16 @@ function writeToLog(type, ...args) {
   const message = args.map(a => {
     if (a instanceof Error) return a.stack || `${a.name}: ${a.message}`;
     if (typeof a === 'object' && a !== null) {
-      try {
-        const str = JSON.stringify(a);
-        return str === '{}' ? (a.message || a.toString()) : str;
-      } catch (e) {
-        return String(a);
-      }
+      const keys = Object.keys(a);
+      const props = Object.getOwnPropertyNames(a);
+      if (keys.length === 0 && props.length === 0) return '';
+      return util.inspect(a, { depth: 4, colors: false, breakLength: Infinity });
     }
     return String(a);
-  }).join(' ');
+  }).filter(Boolean).join(' ');
+
+  if (!message || message.trim() === '{}') return;
+
   const logLine = `[${time}] [${type}] ${message}\n`;
   try {
     fs.appendFileSync(logFilePath, logLine);
