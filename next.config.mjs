@@ -2,6 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  outputFileTracing: false,
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '**.githubusercontent.com' },
