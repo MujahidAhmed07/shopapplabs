@@ -54,6 +54,10 @@ app.prepare().then(() => {
           res.setHeader('Content-Type', contentType);
           res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
           return fs.createReadStream(filePath).pipe(res);
+        } else {
+          // Stale asset requested by cached client -> return 404 cleanly so browser re-fetches fresh bundle
+          res.statusCode = 404;
+          return res.end('Asset Not Found');
         }
       }
 
