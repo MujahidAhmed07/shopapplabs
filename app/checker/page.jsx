@@ -163,7 +163,7 @@ function CheckerPageContent() {
       {/* Header */}
       <div className="text-center space-y-3">
         <h1 className="text-3xl md:text-5xl font-heading font-extrabold text-white">
-          Real-time <span className="text-gradient">Username Checker</span>
+          <span className="text-gradient">Username Checker</span>
         </h1>
         <p className="text-slate-400 text-sm max-w-xl mx-auto">
           Type your brand or personal handle to check availability live across 100+ networks simultaneously.

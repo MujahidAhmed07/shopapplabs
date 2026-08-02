@@ -5,8 +5,8 @@ import GlassCard from '@/components/common/GlassCard';
 import SeoFaq from '@/components/common/SeoFaq';
 
 export const metadata = {
-  title: 'ShopApp Labs | Free Real-Time Social Media Username & Domain Checker',
-  description: 'Instantly check username availability across 100+ social networks, developer hubs, and domain TLDs in real-time.'
+  title: 'ShopApp Labs | Free Social Media Username & Domain Checker',
+  description: 'Instantly check username availability across 100+ social networks, developer hubs, and domain TLDs.'
 };
 
 export default function HomePage() {

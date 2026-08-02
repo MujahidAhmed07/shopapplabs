@@ -8,10 +8,10 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 export const metadata = {
   metadataBase: new URL('https://shopapplabs.com'),
   title: {
-    default: 'ShopApp Labs | Free Real-Time Social Media Username & Domain Checker',
+    default: 'ShopApp Labs | Free Social Media Username & Domain Checker',
     template: '%s | ShopApp Labs'
   },
-  description: 'Instant real-time handle & username search engine across 100+ social media platforms (Instagram, TikTok, YouTube, X, GitHub, Discord) and top-level domain extensions (.com, .io, .dev).',
+  description: 'Instant handle & username search engine across 100+ social media platforms (Instagram, TikTok, YouTube, X, GitHub, Discord) and top-level domain extensions (.com, .io, .dev).',
   keywords: [
     'username checker',
     'social media handle search',
