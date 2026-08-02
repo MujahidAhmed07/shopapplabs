@@ -2,14 +2,9 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/aljadeedelectric/ucheck
+    - pkill -9 -f "lsnode:/home/aljadeedelectric/ucheck/" 2>/dev/null || true
     - mkdir -p $DEPLOYPATH/public/_next
     - rm -rf $DEPLOYPATH/public/_next/static
     - /bin/cp -R $DEPLOYPATH/.next/static $DEPLOYPATH/public/_next/ 2>/dev/null || true
     - mkdir -p $DEPLOYPATH/tmp
     - touch $DEPLOYPATH/tmp/restart.txt
-
-
-
-
-
-
