@@ -23,7 +23,17 @@ function CheckerPageContent() {
   const [progress, setProgress] = useState(0);
   const [copiedId, setCopiedId] = useState(null);
   const [shareCopied, setShareCopied] = useState(false);
-  const [searchHistory, setSearchHistory] = useState(['shopapp', 'mujahid', 'devlabs']);
+  const [searchHistory, setSearchHistory] = useState([]);
+
+  // Load user's search history from localStorage on client mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('username_search_history');
+      if (saved) {
+        setSearchHistory(JSON.parse(saved));
+      }
+    } catch (e) {}
+  }, []);
 
   const filteredPlatforms = PLATFORMS_CONFIG.filter(
     (p) => activeCategory === 'all' || p.category === activeCategory
@@ -68,10 +78,24 @@ function CheckerPageContent() {
     const cleanQuery = newUsername.trim().toLowerCase().replace(/^@/, '');
     router.replace(`/checker?u=${encodeURIComponent(cleanQuery)}&cat=${encodeURIComponent(newCategory)}`);
     
-    if (!searchHistory.includes(cleanQuery)) {
-      setSearchHistory([cleanQuery, ...searchHistory.slice(0, 4)]);
+    if (cleanQuery) {
+      setSearchHistory((prevHistory) => {
+        const filtered = prevHistory.filter((item) => item !== cleanQuery);
+        const updated = [cleanQuery, ...filtered].slice(0, 5);
+        try {
+          localStorage.setItem('username_search_history', JSON.stringify(updated));
+        } catch (e) {}
+        return updated;
+      });
     }
     runCheck(cleanQuery, newCategory);
+  };
+
+  const handleClearHistory = () => {
+    setSearchHistory([]);
+    try {
+      localStorage.removeItem('username_search_history');
+    } catch (e) {}
   };
 
   const handleFormSubmit = (e) => {
@@ -156,17 +180,28 @@ function CheckerPageContent() {
         {/* History Chips & Share Search */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-4 pt-4 border-t border-white/5 text-xs text-slate-400">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-semibold text-slate-500">Recent Searches:</span>
-            {searchHistory.map((item) => (
-              <button
-                key={item}
-                type="button"
-                onClick={() => { setUsername(item); updateUrlAndSearch(item, activeCategory); }}
-                className="px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 text-slate-300 transition-colors"
-              >
-                @{item}
-              </button>
-            ))}
+            {searchHistory.length > 0 && (
+              <>
+                <span className="font-semibold text-slate-500">Recent Searches:</span>
+                {searchHistory.map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    onClick={() => { setUsername(item); updateUrlAndSearch(item, activeCategory); }}
+                    className="px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 text-slate-300 transition-colors"
+                  >
+                    @{item}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={handleClearHistory}
+                  className="text-slate-500 hover:text-slate-400 underline text-[11px] ml-1"
+                >
+                  Clear
+                </button>
+              </>
+            )}
           </div>
 
           <button
