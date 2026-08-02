@@ -10,17 +10,22 @@
     RewriteEngine On
 </IfModule>
 
+# Prevent browser from caching HTML pages so chunk hash mismatches never happen
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    <FilesMatch "\.(html|htm)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires 0
+    </FilesMatch>
+</IfModule>
+
 # Disable ModSecurity rule engine if ModSecurity is active on cPanel causing 400 Bad Request on _next static assets
 <IfModule mod_security2.c>
     SecRuleEngine Off
 </IfModule>
 <IfModule mod_security.c>
     SecRuleEngine Off
-</IfModule>
-
-# Set CORS headers
-<IfModule mod_headers.c>
-    Header set Access-Control-Allow-Origin "*"
 </IfModule>
 
 
