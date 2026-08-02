@@ -8,10 +8,10 @@
   "/domain-availability-checker/page": "app/domain-availability-checker/page.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
   "/apple-icon.png/route": "app/apple-icon.png/route.js",
+  "/robots.txt/route": "app/robots.txt/route.js",
   "/sitemap.xml/route": "app/sitemap.xml/route.js",
   "/icon.png/route": "app/icon.png/route.js",
-  "/robots.txt/route": "app/robots.txt/route.js",
-  "/platforms/page": "app/platforms/page.js",
+  "/products/page": "app/products/page.js",
   "/page": "app/page.js",
-  "/products/page": "app/products/page.js"
+  "/platforms/page": "app/platforms/page.js"
 }
