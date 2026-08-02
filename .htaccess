@@ -4,3 +4,17 @@
     PassengerStartupFile app.js
     PassengerEnabled on
 </IfModule>
+
+# Disable ModSecurity rule engine if ModSecurity is active on cPanel causing 400 Bad Request on _next static assets
+<IfModule mod_security2.c>
+    SecRuleEngine Off
+</IfModule>
+<IfModule mod_security.c>
+    SecRuleEngine Off
+</IfModule>
+
+# Prevent caching of dynamic HTML pages at the Apache level
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+</IfModule>
+

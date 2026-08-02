@@ -90,6 +90,23 @@ export default function RootLayout({ children }) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                window.addEventListener('error', function(e) {
+                  var msg = e && (e.message || (e.error && e.error.message) || '');
+                  if (msg && (msg.indexOf('ChunkLoadError') !== -1 || msg.indexOf('Loading chunk') !== -1)) {
+                    if (!window.sessionStorage.getItem('chunk_reload_attempt')) {
+                      window.sessionStorage.setItem('chunk_reload_attempt', 'true');
+                      window.location.reload(true);
+                    }
+                  }
+                }, true);
+              })();
+            `
+          }}
+        />
       </head>
       <body className="flex flex-col min-h-screen bg-[#090D16] text-slate-100 antialiased">
         <Navbar />
