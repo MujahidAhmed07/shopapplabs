@@ -66,6 +66,19 @@ function fixPermissions(dir) {
 fixPermissions(path.join(__dirname, '.next'));
 fixPermissions(path.join(__dirname, 'public'));
 
+// Sync .next/static to public/_next/static so web servers (Apache/Nginx/cPanel) serve CSS & JS assets directly
+try {
+  const nextStaticDir = path.join(__dirname, '.next', 'static');
+  const publicNextStaticDir = path.join(__dirname, 'public', '_next', 'static');
+  if (fs.existsSync(nextStaticDir)) {
+    fs.mkdirSync(path.join(__dirname, 'public', '_next'), { recursive: true });
+    fs.cpSync(nextStaticDir, publicNextStaticDir, { recursive: true, force: true });
+    writeToLog('INFO', 'Synced .next/static to public/_next/static');
+  }
+} catch (e) {
+  writeToLog('ERROR', 'Static directory sync failed:', e.message);
+}
+
 const dev = false;
 const app = next({ dev, dir: __dirname });
 const handle = app.getRequestHandler();
@@ -86,7 +99,12 @@ app.prepare().then(() => {
       if (pathname.startsWith('/_next/static/')) {
         const rawRelativePath = pathname.replace('/_next/static/', '');
         const safePath = path.normalize(rawRelativePath).replace(/^(\.\.[\/\\])+/, '');
-        const filePath = path.join(__dirname, '.next', 'static', safePath);
+        
+        // Check primary .next/static location first, then public/_next/static fallback
+        let filePath = path.join(__dirname, '.next', 'static', safePath);
+        if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
+          filePath = path.join(__dirname, 'public', '_next', 'static', safePath);
+        }
 
         if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
           const ext = path.extname(filePath).toLowerCase();

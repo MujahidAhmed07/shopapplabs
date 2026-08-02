@@ -2,19 +2,12 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/aljadeedelectric/ucheck
-    - rm -rf $DEPLOYPATH/.next
-    - /bin/cp -R .next $DEPLOYPATH/
-    - /bin/cp -R app $DEPLOYPATH/
-    - /bin/cp -R components $DEPLOYPATH/
-    - /bin/cp -R lib $DEPLOYPATH/
-    - /bin/cp -R public $DEPLOYPATH/
-    - /bin/cp app.js $DEPLOYPATH/
-    - /bin/cp server.js $DEPLOYPATH/
-    - /bin/cp .htaccess $DEPLOYPATH/
-    - /bin/cp package.json $DEPLOYPATH/
-    - /bin/cp next.config.mjs $DEPLOYPATH/
+    - mkdir -p $DEPLOYPATH/public/_next
+    - rm -rf $DEPLOYPATH/public/_next/static
+    - /bin/cp -R $DEPLOYPATH/.next/static $DEPLOYPATH/public/_next/ 2>/dev/null || true
     - mkdir -p $DEPLOYPATH/tmp
     - touch $DEPLOYPATH/tmp/restart.txt
+
 
 
 
