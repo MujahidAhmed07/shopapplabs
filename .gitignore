@@ -6,6 +6,7 @@ build/
 .vite/
 .next/cache/
 *.nft.json
+*server-reference-manifest*
 
 # Python leftovers
 __pycache__/
