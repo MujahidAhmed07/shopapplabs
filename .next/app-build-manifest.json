@@ -53,14 +53,6 @@
       "static/chunks/273-c13b7976042b60a9.js",
       "static/chunks/app/domain-availability-checker/page-4cfef01ff133f555.js"
     ],
-    "/platforms/page": [
-      "static/chunks/webpack-cdaf9171b4e4094c.js",
-      "static/chunks/fd9d1056-9123c93caf233aef.js",
-      "static/chunks/117-48dd1562a62288a2.js",
-      "static/chunks/main-app-ebc267ca8e803733.js",
-      "static/chunks/972-b325aaa66f4acca2.js",
-      "static/chunks/app/platforms/page-5d50bf6307a95423.js"
-    ],
     "/page": [
       "static/chunks/webpack-cdaf9171b4e4094c.js",
       "static/chunks/fd9d1056-9123c93caf233aef.js",
@@ -69,6 +61,14 @@
       "static/chunks/972-b325aaa66f4acca2.js",
       "static/chunks/448-eedba67d9218e5d0.js",
       "static/chunks/app/page-d2c66f74ab8c63d0.js"
+    ],
+    "/platforms/page": [
+      "static/chunks/webpack-cdaf9171b4e4094c.js",
+      "static/chunks/fd9d1056-9123c93caf233aef.js",
+      "static/chunks/117-48dd1562a62288a2.js",
+      "static/chunks/main-app-ebc267ca8e803733.js",
+      "static/chunks/972-b325aaa66f4acca2.js",
+      "static/chunks/app/platforms/page-5d50bf6307a95423.js"
     ],
     "/products/page": [
       "static/chunks/webpack-cdaf9171b4e4094c.js",
