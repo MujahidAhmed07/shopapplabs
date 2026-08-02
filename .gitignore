@@ -1,10 +1,12 @@
 # Dependencies & Build Output
 node_modules/
-.next/
 dist/
 out/
 build/
 .vite/
+
+# Keep .next/ tracked so cPanel Git deployments work without running npm build on server
+# !.next/
 
 # Python leftovers
 __pycache__/
