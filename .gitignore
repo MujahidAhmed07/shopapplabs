@@ -4,6 +4,7 @@ dist/
 out/
 build/
 .vite/
+*.nft.json
 
 # Keep .next/ tracked so cPanel Git deployments work without running npm build on server
 # !.next/
