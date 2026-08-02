@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, Loader2, RefreshCw, ExternalLink, Check, Copy, ArrowLeft, ShieldCheck, Sparkles } from 'lucide-react';
+import { Search, Loader2, RefreshCw, ExternalLink, Check, Copy, ArrowLeft, ShieldCheck, Sparkles, Wand2 } from 'lucide-react';
 import GlassCard from '@/components/common/GlassCard';
 import ResultBadge from '@/components/common/ResultBadge';
 import SeoFaq from '@/components/common/SeoFaq';
 import { checkSinglePlatform } from '@/lib/services/apiClient';
+import { generateUsernameSuggestions } from '@/lib/utils/usernameSuggestions';
 
 export default function SinglePlatformClient({ platformKey, platformId, platformMeta, details, platformSlug }) {
   const [username, setUsername] = useState('shopapp');
@@ -14,9 +15,8 @@ export default function SinglePlatformClient({ platformKey, platformId, platform
   const [isSearching, setIsSearching] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const handleSearch = async (e) => {
-    if (e) e.preventDefault();
-    const query = username.trim().toLowerCase().replace(/^@/, '');
+  const triggerSearch = async (targetUsername) => {
+    const query = targetUsername.trim().toLowerCase().replace(/^@/, '');
     if (!query) return;
 
     setIsSearching(true);
@@ -25,6 +25,11 @@ export default function SinglePlatformClient({ platformKey, platformId, platform
     const res = await checkSinglePlatform(platformId, query);
     setResult(res);
     setIsSearching(false);
+  };
+
+  const handleSearch = (e) => {
+    if (e) e.preventDefault();
+    triggerSearch(username);
   };
 
   useEffect(() => {
@@ -115,6 +120,27 @@ export default function SinglePlatformClient({ platformKey, platformId, platform
                 {result.full_name} {result.followers ? `• ${result.followers.toLocaleString()} Followers` : ''}
               </div>
             )}
+
+            {/* Pretty Handle Suggestions */}
+            <div className="p-4 rounded-xl bg-slate-900/80 border border-white/5 space-y-2">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-indigo-400">
+                <Wand2 className="w-3.5 h-3.5 text-indigo-400" />
+                <span>Pretty {platformMeta.name} Handle Alternatives:</span>
+              </div>
+              <div className="flex items-center gap-2 flex-wrap text-xs">
+                {generateUsernameSuggestions(username).map((sugg) => (
+                  <button
+                    key={sugg}
+                    type="button"
+                    onClick={() => { setUsername(sugg); triggerSearch(sugg); }}
+                    className="px-3 py-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-200 border border-indigo-500/20 font-mono transition-all hover:scale-105 active:scale-95 flex items-center gap-1"
+                  >
+                    <Sparkles className="w-3 h-3 text-indigo-400" />
+                    @{sugg}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             <div className="flex items-center justify-between text-xs pt-2">
               <a

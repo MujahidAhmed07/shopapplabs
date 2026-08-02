@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Search, Loader2, RefreshCw, ExternalLink, Check, Copy, Share2 } from 'lucide-react';
+import { Search, Loader2, RefreshCw, ExternalLink, Check, Copy, Share2, Sparkles, Wand2 } from 'lucide-react';
 import GlassCard from '@/components/common/GlassCard';
 import ResultBadge from '@/components/common/ResultBadge';
 import SeoFaq from '@/components/common/SeoFaq';
 import { PLATFORMS_CONFIG, CATEGORIES } from '@/lib/config/platforms';
 import { checkSinglePlatform } from '@/lib/services/apiClient';
+import { generateUsernameSuggestions } from '@/lib/utils/usernameSuggestions';
 
 function CheckerPageContent() {
   const searchParams = useSearchParams();
@@ -220,6 +221,29 @@ function CheckerPageContent() {
             )}
           </button>
         </div>
+
+        {/* Smart Pretty Username Suggestions Bar */}
+        {username && (
+          <div className="mt-4 pt-4 border-t border-white/5 space-y-2">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-indigo-400">
+              <Wand2 className="w-3.5 h-3.5" />
+              <span>Pretty Available Handle Alternatives:</span>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap text-xs">
+              {generateUsernameSuggestions(username).map((sugg) => (
+                <button
+                  key={sugg}
+                  type="button"
+                  onClick={() => { setUsername(sugg); updateUrlAndSearch(sugg, activeCategory); }}
+                  className="px-2.5 py-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-200 border border-indigo-500/20 font-mono transition-all hover:scale-105 active:scale-95 flex items-center gap-1"
+                >
+                  <Sparkles className="w-3 h-3 text-indigo-400" />
+                  @{sugg}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </GlassCard>
 
       {/* Progress & Category Filter Controls */}
@@ -291,6 +315,27 @@ function CheckerPageContent() {
                 <div className="text-xs bg-white/5 p-2.5 rounded-lg text-slate-300">
                   <span className="text-slate-400 block text-[10px] uppercase font-semibold">Account Owner</span>
                   {res.full_name}
+                </div>
+              )}
+
+              {/* Pretty Alternatives for Taken / Unavailable Handles */}
+              {res.status === 'TAKEN' && (
+                <div className="text-xs bg-slate-900/60 p-2.5 rounded-xl border border-white/5 space-y-1.5">
+                  <span className="text-slate-400 text-[11px] font-medium flex items-center gap-1">
+                    <Wand2 className="w-3 h-3 text-indigo-400" /> Pretty Alternatives:
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {generateUsernameSuggestions(username).slice(0, 3).map((alt) => (
+                      <button
+                        key={alt}
+                        type="button"
+                        onClick={() => { setUsername(alt); updateUrlAndSearch(alt, activeCategory); }}
+                        className="px-2 py-0.5 rounded bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 text-[11px] font-mono border border-indigo-500/20 transition-colors"
+                      >
+                        @{alt}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
 
