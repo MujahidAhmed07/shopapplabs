@@ -8,7 +8,7 @@ import ResultBadge from '@/components/common/ResultBadge';
 import SeoFaq from '@/components/common/SeoFaq';
 import { PLATFORMS_CONFIG, CATEGORIES } from '@/lib/config/platforms';
 import { checkSinglePlatform } from '@/lib/services/apiClient';
-import { generateUsernameSuggestions } from '@/lib/utils/usernameSuggestions';
+import { generateUsernameSuggestions, getVerifiedAvailableSuggestions } from '@/lib/utils/usernameSuggestions';
 
 function CheckerPageContent() {
   const searchParams = useSearchParams();
