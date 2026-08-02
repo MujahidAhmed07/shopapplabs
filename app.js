@@ -46,38 +46,9 @@ writeToLog('INFO', `Node version: ${process.version}, Platform: ${process.platfo
 writeToLog('INFO', `Current directory: ${__dirname}`);
 
 
-// Recursively fix directory & file permissions on .next & public to prevent Linux cPanel EACCES errors
-function fixPermissions(dir) {
-  try {
-    if (!fs.existsSync(dir)) return;
-    try { fs.chmodSync(dir, 0o755); } catch (e) {}
-    const entries = fs.readdirSync(dir, { withFileTypes: true });
-    for (const entry of entries) {
-      const fullPath = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        fixPermissions(fullPath);
-      } else {
-        try { fs.chmodSync(fullPath, 0o644); } catch (e) {}
-      }
-    }
-  } catch (e) {}
-}
-
-fixPermissions(path.join(__dirname, '.next'));
-fixPermissions(path.join(__dirname, 'public'));
-
-// Sync .next/static to public/_next/static so web servers (Apache/Nginx/cPanel) serve CSS & JS assets directly
-try {
-  const nextStaticDir = path.join(__dirname, '.next', 'static');
-  const publicNextStaticDir = path.join(__dirname, 'public', '_next', 'static');
-  if (fs.existsSync(nextStaticDir)) {
-    fs.mkdirSync(path.join(__dirname, 'public', '_next'), { recursive: true });
-    fs.cpSync(nextStaticDir, publicNextStaticDir, { recursive: true, force: true });
-    writeToLog('INFO', 'Synced .next/static to public/_next/static');
-  }
-} catch (e) {
-  writeToLog('ERROR', 'Static directory sync failed:', e.message);
-}
+// Fast lightweight permission check for top-level folders
+try { if (fs.existsSync(path.join(__dirname, '.next'))) fs.chmodSync(path.join(__dirname, '.next'), 0o755); } catch (e) {}
+try { if (fs.existsSync(path.join(__dirname, 'public'))) fs.chmodSync(path.join(__dirname, 'public'), 0o755); } catch (e) {}
 
 const dev = false;
 const app = next({ dev, dir: __dirname });
