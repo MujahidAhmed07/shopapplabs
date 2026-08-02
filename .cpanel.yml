@@ -1,7 +1,7 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/aljadeedelectric/shopapplabs.com
+    - export DEPLOYPATH=/home/aljadeedelectric/uchecker
     - /bin/cp -R * $DEPLOYPATH
-    - cd $DEPLOYPATH && npm install --production && npm run build
+    - cd $DEPLOYPATH && source /home/aljadeedelectric/nodevenv/uchecker/24/bin/activate && npm install --production=false && npm run build
     - touch $DEPLOYPATH/tmp/restart.txt
