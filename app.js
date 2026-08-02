@@ -8,6 +8,39 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// File logging helper for cPanel environment
+const logFilePath = path.join(__dirname, 'server.log');
+
+function writeToLog(type, ...args) {
+  const time = new Date().toISOString();
+  const message = args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ');
+  const logLine = `[${time}] [${type}] ${message}\n`;
+  try {
+    fs.appendFileSync(logFilePath, logLine);
+  } catch (e) {}
+}
+
+const originalLog = console.log;
+const originalError = console.error;
+
+console.log = (...args) => {
+  originalLog(...args);
+  writeToLog('INFO', ...args);
+};
+
+console.error = (...args) => {
+  originalError(...args);
+  writeToLog('ERROR', ...args);
+};
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 // Recursively fix directory & file permissions on .next & public to prevent Linux cPanel EACCES errors
 function fixPermissions(dir) {
   try {
@@ -32,6 +65,7 @@ const dev = false;
 const app = next({ dev, dir: __dirname });
 const handle = app.getRequestHandler();
 const port = process.env.PORT || 3000;
+
 
 app.prepare().then(() => {
   createServer(async (req, res) => {
