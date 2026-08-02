@@ -8,8 +8,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Recursively fix directory & file permissions on .next to prevent Linux cPanel EACCES errors
-function fixNextPermissions(dir) {
+// Recursively fix directory & file permissions on .next & public to prevent Linux cPanel EACCES errors
+function fixPermissions(dir) {
   try {
     if (!fs.existsSync(dir)) return;
     try { fs.chmodSync(dir, 0o755); } catch (e) {}
@@ -17,7 +17,7 @@ function fixNextPermissions(dir) {
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
       if (entry.isDirectory()) {
-        fixNextPermissions(fullPath);
+        fixPermissions(fullPath);
       } else {
         try { fs.chmodSync(fullPath, 0o644); } catch (e) {}
       }
@@ -25,8 +25,8 @@ function fixNextPermissions(dir) {
   } catch (e) {}
 }
 
-const nextDir = path.join(__dirname, '.next');
-fixNextPermissions(nextDir);
+fixPermissions(path.join(__dirname, '.next'));
+fixPermissions(path.join(__dirname, 'public'));
 
 const dev = false;
 const app = next({ dev, dir: __dirname });
@@ -43,7 +43,7 @@ app.prepare().then(() => {
         pathname = decodeURIComponent(pathname);
       } catch (e) {}
 
-      // Direct fallback stream handler for /_next/static/ requests to guarantee CSS & JS loading in cPanel
+      // Direct fallback stream handler for /_next/static/ requests
       if (pathname.startsWith('/_next/static/')) {
         const rawRelativePath = pathname.replace('/_next/static/', '');
         const safePath = path.normalize(rawRelativePath).replace(/^(\.\.[\/\\])+/, '');
@@ -62,46 +62,64 @@ app.prepare().then(() => {
           else if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';
           else if (ext === '.svg') contentType = 'image/svg+xml';
           
-          res.writeHead(200, {
-            'Content-Type': contentType,
-            'Cache-Control': 'public, max-age=31536000, immutable',
-            'Access-Control-Allow-Origin': '*'
+          res.setHeader('Content-Type', contentType);
+          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+          res.setHeader('Access-Control-Allow-Origin', '*');
+          
+          const stream = fs.createReadStream(filePath);
+          stream.on('error', () => {
+            if (!res.headersSent) {
+              res.statusCode = 500;
+              res.end('Read Error');
+            }
           });
-          return fs.createReadStream(filePath).pipe(res);
+          return stream.pipe(res);
         } else {
-          // Stale asset requested by cached client -> return 404 cleanly so browser re-fetches fresh bundle
-          res.writeHead(404, {
-            'Content-Type': 'text/plain',
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Access-Control-Allow-Origin': '*'
-          });
-          return res.end('Asset Not Found');
+          if (!res.headersSent) {
+            res.statusCode = 404;
+            res.setHeader('Content-Type', 'text/plain');
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            return res.end('Asset Not Found');
+          }
         }
       }
 
-      // Direct static fallback handler for public/ files (favicon.ico, icon.png, apple-icon.png)
-      if (pathname !== '/' && !pathname.startsWith('/api/')) {
+      // Direct static fallback handler for public/ files (favicon.ico, icon.png, apple-icon.png, etc.)
+      if (pathname !== '/' && !pathname.startsWith('/api/') && !pathname.startsWith('/_next/')) {
         const safePublicPath = path.normalize(pathname.replace(/^\//, '')).replace(/^(\.\.[\/\\])+/, '');
         const publicFilePath = path.join(__dirname, 'public', safePublicPath);
-        if (fs.existsSync(publicFilePath) && fs.statSync(publicFilePath).isFile()) {
-          const ext = path.extname(publicFilePath).toLowerCase();
-          let contentType = 'application/octet-stream';
-          if (ext === '.ico') contentType = 'image/x-icon';
-          else if (ext === '.png') contentType = 'image/png';
-          else if (ext === '.svg') contentType = 'image/svg+xml';
-          else if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';
-          
-          res.writeHead(200, {
-            'Content-Type': contentType,
-            'Cache-Control': 'public, max-age=86400',
-            'Access-Control-Allow-Origin': '*'
-          });
-          return fs.createReadStream(publicFilePath).pipe(res);
-        }
+        
+        try {
+          if (fs.existsSync(publicFilePath) && fs.statSync(publicFilePath).isFile()) {
+            const ext = path.extname(publicFilePath).toLowerCase();
+            let contentType = 'application/octet-stream';
+            if (ext === '.ico') contentType = 'image/x-icon';
+            else if (ext === '.png') contentType = 'image/png';
+            else if (ext === '.svg') contentType = 'image/svg+xml';
+            else if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';
+            else if (ext === '.json') contentType = 'application/json';
+            else if (ext === '.txt') contentType = 'text/plain';
+            else if (ext === '.xml') contentType = 'application/xml';
+            
+            res.setHeader('Content-Type', contentType);
+            res.setHeader('Cache-Control', 'public, max-age=86400');
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            
+            const stream = fs.createReadStream(publicFilePath);
+            stream.on('error', () => {
+              if (!res.headersSent) {
+                res.statusCode = 500;
+                res.end('Read Error');
+              }
+            });
+            return stream.pipe(res);
+          }
+        } catch (e) {}
       }
 
-      // Set no-cache for HTML pages so browsers always fetch fresh HTML with current asset hashes
-      if (!pathname.startsWith('/_next/') && !pathname.startsWith('/api/')) {
+      // Set anti-caching headers ONLY for HTML page documents (not static assets or extension files)
+      if (!pathname.startsWith('/_next/') && !pathname.startsWith('/api/') && !pathname.includes('.')) {
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0');
         res.setHeader('Pragma', 'no-cache');
         res.setHeader('Expires', '0');
@@ -110,8 +128,10 @@ app.prepare().then(() => {
       await handle(req, res, parsedUrl);
     } catch (err) {
       console.error('Error occurred handling', req.url, err);
-      res.statusCode = 500;
-      res.end('Internal Server Error');
+      if (!res.headersSent) {
+        res.statusCode = 500;
+        res.end('Internal Server Error');
+      }
     }
   }).listen(port, (err) => {
     if (err) throw err;
@@ -121,4 +141,5 @@ app.prepare().then(() => {
   console.error(ex.stack);
   process.exit(1);
 });
+
 
