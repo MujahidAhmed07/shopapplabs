@@ -2,6 +2,7 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/aljadeedelectric/ucheck
+    - cd $DEPLOYPATH && git reset --hard HEAD && git clean -fd 2>/dev/null || true
     - pkill -9 -f "lsnode:/home/aljadeedelectric/ucheck/" 2>/dev/null || true
     - mkdir -p $DEPLOYPATH/public/_next
     - rm -rf $DEPLOYPATH/public/_next/static
