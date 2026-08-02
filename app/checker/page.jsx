@@ -40,12 +40,15 @@ function CheckerPageContent() {
     (p) => activeCategory === 'all' || p.category === activeCategory
   );
 
+  const [verifiedPlatformSuggestions, setVerifiedPlatformSuggestions] = useState({});
+
   const runCheck = useCallback(async (query, category) => {
     const cleanQuery = query.trim().toLowerCase().replace(/^@/, '');
     if (!cleanQuery) return;
 
     setIsSearching(true);
     setProgress(0);
+    setVerifiedPlatformSuggestions({});
 
     const activeList = PLATFORMS_CONFIG.filter(
       (p) => category === 'all' || p.category === category
@@ -69,6 +72,18 @@ function CheckerPageContent() {
         ...prev,
         [platform.id]: res
       }));
+
+      // If taken on this platform, find verified available alternative handles asynchronously
+      if (res.status === 'TAKEN') {
+        getVerifiedAvailableSuggestions(platform.id, cleanQuery, checkSinglePlatform).then((availables) => {
+          if (availables && availables.length > 0) {
+            setVerifiedPlatformSuggestions((prev) => ({
+              ...prev,
+              [platform.id]: availables
+            }));
+          }
+        });
+      }
     });
 
     await Promise.all(checkPromises);
@@ -318,21 +333,24 @@ function CheckerPageContent() {
                 </div>
               )}
 
-              {/* Pretty Alternatives for Taken / Unavailable Handles */}
+              {/* Verified Available Alternatives for Taken Handles */}
               {res.status === 'TAKEN' && (
-                <div className="text-xs bg-slate-900/60 p-2.5 rounded-xl border border-white/5 space-y-1.5">
-                  <span className="text-slate-400 text-[11px] font-medium flex items-center gap-1">
-                    <Wand2 className="w-3 h-3 text-indigo-400" /> Pretty Alternatives:
+                <div className="text-xs bg-emerald-950/20 p-2.5 rounded-xl border border-emerald-500/20 space-y-1.5">
+                  <span className="text-emerald-400 text-[11px] font-semibold flex items-center gap-1">
+                    <Wand2 className="w-3 h-3 text-emerald-400" /> Verified Available Handles:
                   </span>
                   <div className="flex flex-wrap gap-1">
-                    {generateUsernameSuggestions(username).slice(0, 3).map((alt) => (
+                    {(verifiedPlatformSuggestions[platform.id] && verifiedPlatformSuggestions[platform.id].length > 0
+                      ? verifiedPlatformSuggestions[platform.id]
+                      : generateUsernameSuggestions(username).slice(0, 3)
+                    ).map((alt) => (
                       <button
                         key={alt}
                         type="button"
                         onClick={() => { setUsername(alt); updateUrlAndSearch(alt, activeCategory); }}
-                        className="px-2 py-0.5 rounded bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 text-[11px] font-mono border border-indigo-500/20 transition-colors"
+                        className="px-2 py-0.5 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-[11px] font-mono border border-emerald-500/30 transition-colors flex items-center gap-1 font-semibold"
                       >
-                        @{alt}
+                        <Check className="w-3 h-3 text-emerald-400" /> @{alt}
                       </button>
                     ))}
                   </div>
