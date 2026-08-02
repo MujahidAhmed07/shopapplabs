@@ -61,6 +61,23 @@ app.prepare().then(() => {
         }
       }
 
+      // Direct static fallback handler for public/ files (favicon.ico, icon.png, apple-icon.png)
+      if (pathname !== '/' && !pathname.startsWith('/api/')) {
+        const publicFilePath = path.join(__dirname, 'public', pathname.replace(/^\//, ''));
+        if (fs.existsSync(publicFilePath) && fs.statSync(publicFilePath).isFile()) {
+          const ext = path.extname(publicFilePath);
+          let contentType = 'application/octet-stream';
+          if (ext === '.ico') contentType = 'image/x-icon';
+          else if (ext === '.png') contentType = 'image/png';
+          else if (ext === '.svg') contentType = 'image/svg+xml';
+          else if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';
+          
+          res.setHeader('Content-Type', contentType);
+          res.setHeader('Cache-Control', 'public, max-age=86400');
+          return fs.createReadStream(publicFilePath).pipe(res);
+        }
+      }
+
       // Set no-cache for HTML pages so browsers always fetch fresh HTML with current asset hashes
       if (!pathname.startsWith('/_next/') && !pathname.startsWith('/api/')) {
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
