@@ -2,6 +2,6 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/aljadeedelectric/uchecker
-    - /bin/cp -R * $DEPLOYPATH
-    - cd $DEPLOYPATH && source /home/aljadeedelectric/nodevenv/uchecker/24/bin/activate && npm install --production=false && npm run build
+    - /bin/cp -R .next .htaccess * $DEPLOYPATH 2>/dev/null || true
     - touch $DEPLOYPATH/tmp/restart.txt
+
