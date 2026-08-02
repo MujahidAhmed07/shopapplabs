@@ -1,7 +1,7 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/aljadeedelectrics/usernamechecker
+    - export DEPLOYPATH=/home/aljadeedelectric/usernamechecker
     - rm -rf $DEPLOYPATH/.next
     - /bin/cp -R .next $DEPLOYPATH/
     - /bin/cp -R app $DEPLOYPATH/
