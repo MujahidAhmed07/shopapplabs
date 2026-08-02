@@ -26,6 +26,15 @@ export const metadata = {
   authors: [{ name: 'ShopApp Labs' }],
   creator: 'ShopApp Labs',
   publisher: 'ShopApp Labs',
+  icons: {
+    icon: [
+      { url: '/icon.png', type: 'image/png', sizes: '512x512' }
+    ],
+    apple: [
+      { url: '/apple-icon.png', type: 'image/png', sizes: '512x512' }
+    ],
+    shortcut: '/icon.png'
+  },
   robots: {
     index: true,
     follow: true,
