@@ -2,39 +2,30 @@ import { PLATFORMS_CONFIG } from '@/lib/config/platforms';
 
 export default async function sitemap() {
   const baseUrl = 'https://shopapplabs.com';
+  const currentDate = new Date().toISOString();
 
-  // Base pages
-  const routes = [
-    '',
-    '/checker',
-    '/platforms',
-    '/products',
-    '/domain-availability-checker'
+  // Core high-priority pages
+  const coreRoutes = [
+    { url: `${baseUrl}`, priority: 1.0, changeFrequency: 'daily' },
+    { url: `${baseUrl}/checker`, priority: 1.0, changeFrequency: 'daily' },
+    { url: `${baseUrl}/platforms`, priority: 0.9, changeFrequency: 'weekly' },
+    { url: `${baseUrl}/domain-availability-checker`, priority: 0.9, changeFrequency: 'weekly' },
+    { url: `${baseUrl}/products`, priority: 0.8, changeFrequency: 'weekly' },
   ].map((route) => ({
-    url: `${baseUrl}${route}`,
-    lastModified: new Date().toISOString(),
-    changeFrequency: 'daily',
-    priority: route === '' ? 1.0 : 0.8
+    ...route,
+    lastModified: currentDate,
   }));
 
-  // Platform specific SEO landing pages
-  const platformRoutes = [
-    'instagram',
-    'tiktok',
-    'youtube',
-    'twitter',
-    'github',
-    'facebook',
-    'discord',
-    'twitch',
-    'reddit',
-    'pinterest'
-  ].map((platformKey) => ({
-    url: `${baseUrl}/${platformKey}-username-checker`,
-    lastModified: new Date().toISOString(),
-    changeFrequency: 'weekly',
-    priority: 0.9
-  }));
+  // Dedicated landing pages for every supported platform
+  const platformRoutes = PLATFORMS_CONFIG
+    .filter((p) => !p.id.startsWith('domain_'))
+    .map((platform) => ({
+      url: `${baseUrl}/${platform.id}-username-checker`,
+      lastModified: currentDate,
+      changeFrequency: 'daily',
+      priority: 0.9,
+    }));
 
-  return [...routes, ...platformRoutes];
+  return [...coreRoutes, ...platformRoutes];
 }
+

@@ -5,13 +5,46 @@ import GlassCard from '@/components/common/GlassCard';
 import { PLATFORMS_CONFIG, CATEGORIES } from '@/lib/config/platforms';
 
 export const metadata = {
-  title: 'Supported Platforms & Networks | ShopApp Labs Username Checker',
-  description: 'Explore all 100+ social media networks, developer platforms, gaming hubs, and domain extensions supported by ShopApp Labs.'
+  title: 'Supported Social Media Networks & Domain Platforms | ShopApp Labs',
+  description: 'Explore all 100+ social media networks, developer platforms, gaming hubs, and domain extensions supported by ShopApp Labs Username Checker.',
+  alternates: {
+    canonical: 'https://shopapplabs.com/platforms'
+  },
+  openGraph: {
+    title: 'Supported Social Media Networks & Domain Platforms | ShopApp Labs',
+    description: 'Explore all 100+ social media networks, developer platforms, gaming hubs, and domain extensions supported by ShopApp Labs Username Checker.',
+    url: 'https://shopapplabs.com/platforms',
+    type: 'website',
+    images: ['/og-image.png']
+  }
 };
 
 export default function PlatformDirectoryPage() {
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://shopapplabs.com'
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Supported Platforms',
+        item: 'https://shopapplabs.com/platforms'
+      }
+    ]
+  };
+
   return (
     <div className="max-w-7xl mx-auto py-12 px-2 md:px-6 space-y-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       
       {/* Page Header */}
       <div className="text-center space-y-4 max-w-3xl mx-auto">

@@ -163,10 +163,10 @@ function CheckerPageContent() {
       {/* Header */}
       <div className="text-center space-y-3">
         <h1 className="text-3xl md:text-5xl font-heading font-extrabold text-white">
-          <span className="text-gradient">Username Checker</span>
+          Social Media <span className="text-gradient">Username Checker</span>
         </h1>
-        <p className="text-slate-400 text-sm max-w-xl mx-auto">
-          Type your brand or personal handle to check availability live across 100+ networks simultaneously.
+        <p className="text-slate-400 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
+          Search username availability live across 100+ social media networks, developer platforms, gaming hubs, and domain TLD extensions (.com, .io, .dev).
         </p>
       </div>
 

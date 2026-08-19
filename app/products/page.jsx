@@ -6,12 +6,45 @@ import { PRODUCTS_CATALOG } from '@/lib/config/products';
 
 export const metadata = {
   title: 'Digital Products & SaaS Tools | ShopApp Labs',
-  description: 'Explore SaaS applications, digital tools, and templates created by ShopApp Labs.'
+  description: 'Explore SaaS applications, digital tools, and templates created by ShopApp Labs.',
+  alternates: {
+    canonical: 'https://shopapplabs.com/products'
+  },
+  openGraph: {
+    title: 'Digital Products & SaaS Tools | ShopApp Labs',
+    description: 'Explore SaaS applications, digital tools, and templates created by ShopApp Labs.',
+    url: 'https://shopapplabs.com/products',
+    type: 'website',
+    images: ['/og-image.png']
+  }
 };
 
 export default function ProductsPage() {
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://shopapplabs.com'
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Products',
+        item: 'https://shopapplabs.com/products'
+      }
+    ]
+  };
+
   return (
     <div className="max-w-7xl mx-auto py-12 px-2 md:px-6 space-y-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       
       {/* Header */}
       <div className="text-center space-y-4 max-w-2xl mx-auto">

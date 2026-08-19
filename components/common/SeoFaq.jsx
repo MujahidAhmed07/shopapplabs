@@ -265,8 +265,25 @@ export default function SeoFaq({ platformKey, platformName }) {
     ? PLATFORM_FAQS[platformKey]
     : GENERIC_FAQS;
 
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer
+      }
+    }))
+  };
+
   return (
     <section className="space-y-8 pt-8 border-t border-white/10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
 
       {/* FAQ Header */}
       <div className="text-center space-y-3">
@@ -297,3 +314,4 @@ export default function SeoFaq({ platformKey, platformName }) {
     </section>
   );
 }
+
