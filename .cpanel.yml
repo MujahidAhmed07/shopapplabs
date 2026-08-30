@@ -2,12 +2,23 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/aljadeedelectric/ucheck
+    - export NODE_ENV=production
+    # Backup existing static chunks to prevent ChunkLoadError for in-flight sessions
     - mkdir -p /tmp/ucheck_static_backup 2>/dev/null || true
     - cp -Rf $DEPLOYPATH/public/_next/static/* /tmp/ucheck_static_backup/ 2>/dev/null || true
+    # Pull latest source from git
     - cd $DEPLOYPATH && git reset --hard HEAD && git clean -fd 2>/dev/null || true
+    # Kill any running Passenger lsnode process
     - pkill -9 -f "lsnode:/home/aljadeedelectric/ucheck/" 2>/dev/null || true
+    # Install production dependencies only
+    - cd $DEPLOYPATH && NODE_ENV=production npm install --omit=dev --ignore-scripts 2>/dev/null || npm install --production --ignore-scripts
+    # Build optimized production bundle
+    - cd $DEPLOYPATH && NODE_ENV=production npm run build
+    # Restore previous static chunks (preserves older chunks for in-flight browser tabs)
     - mkdir -p $DEPLOYPATH/public/_next/static
     - cp -Rf /tmp/ucheck_static_backup/* $DEPLOYPATH/public/_next/static/ 2>/dev/null || true
+    # Copy fresh build static chunks into public/ for fallback stream handler
     - /bin/cp -Rf $DEPLOYPATH/.next/static/* $DEPLOYPATH/public/_next/static/ 2>/dev/null || true
+    # Restart Phusion Passenger
     - mkdir -p $DEPLOYPATH/tmp
     - touch $DEPLOYPATH/tmp/restart.txt
