@@ -142,31 +142,63 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
-                function handleChunkError(e) {
-                  var err = e && (e.error || e.reason || e);
-                  var msg = (err && (err.message || err.name || String(err))) || '';
-                  var isChunk =
+                function isChunkError(msg) {
+                  return (
                     msg.indexOf('ChunkLoadError') !== -1 ||
                     msg.indexOf('Loading chunk') !== -1 ||
                     msg.indexOf('Failed to fetch dynamically imported module') !== -1 ||
-                    msg.indexOf('Importing a module script failed') !== -1;
-                  
-                  if (isChunk) {
-                    var now = Date.now();
-                    var lastReload = parseInt(window.sessionStorage.getItem('last_chunk_error_reload') || '0', 10);
-                    if (now - lastReload > 12000) {
-                      window.sessionStorage.setItem('last_chunk_error_reload', String(now));
-                      var cleanUrl = window.location.href.split('#')[0];
-                      window.location.href = cleanUrl;
-                    }
-                  }
+                    msg.indexOf('Importing a module script failed') !== -1 ||
+                    msg.indexOf('Loading CSS chunk') !== -1 ||
+                    msg.indexOf('Cannot read properties of undefined') !== -1
+                  );
                 }
-                window.addEventListener('error', handleChunkError, true);
-                window.addEventListener('unhandledrejection', handleChunkError, true);
+
+                function tryReload(reason) {
+                  try {
+                    var now = Date.now();
+                    var key = 'chunk_reload_at';
+                    var lastReload = parseInt(sessionStorage.getItem(key) || '0', 10);
+                    // Only reload if we haven't reloaded in the last 20s (anti-loop)
+                    if (now - lastReload > 20000) {
+                      sessionStorage.setItem(key, String(now));
+                      // Cache-bust the URL to force fresh HTML from server
+                      var url = window.location.href.split('?')[0].split('#')[0];
+                      var sep = url.indexOf('?') === -1 ? '?' : '&';
+                      window.location.replace(url + sep + '__r=' + now);
+                    }
+                  } catch(e) {}
+                }
+
+                function handleError(e) {
+                  var err = e && (e.error || e.reason || e);
+                  var msg = '';
+                  try { msg = (err && (err.message || err.name || String(err))) || (e && e.message) || ''; } catch(x) {}
+                  if (isChunkError(msg)) tryReload('error-event');
+                }
+
+                window.addEventListener('error', handleError, true);
+                window.addEventListener('unhandledrejection', handleError, true);
+
+                // Also watch for failed <script src> tags via MutationObserver
+                if (typeof MutationObserver !== 'undefined') {
+                  var observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(m) {
+                      m.addedNodes.forEach(function(node) {
+                        if (node.tagName === 'SCRIPT' && node.src && node.src.indexOf('/_next/static/chunks/') !== -1) {
+                          node.addEventListener('error', function() {
+                            tryReload('script-load-failure');
+                          });
+                        }
+                      });
+                    });
+                  });
+                  observer.observe(document.documentElement, { childList: true, subtree: true });
+                }
               })();
             `
           }}
         />
+
       </head>
       <body className="flex flex-col min-h-screen bg-[#090D16] text-slate-100 antialiased">
         <Navbar />

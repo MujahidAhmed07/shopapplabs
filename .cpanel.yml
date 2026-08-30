@@ -3,22 +3,23 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home/aljadeedelectric/ucheck
     - export NODE_ENV=production
-    # Backup existing static chunks to prevent ChunkLoadError for in-flight sessions
+    # Step 1 — Backup ALL existing static chunks before anything is deleted
     - mkdir -p /tmp/ucheck_static_backup 2>/dev/null || true
     - cp -Rf $DEPLOYPATH/public/_next/static/* /tmp/ucheck_static_backup/ 2>/dev/null || true
-    # Pull latest source from git
+    - cp -Rf $DEPLOYPATH/.next/static/* /tmp/ucheck_static_backup/ 2>/dev/null || true
+    # Step 2 — Pull latest source from GitHub
     - cd $DEPLOYPATH && git reset --hard HEAD && git clean -fd 2>/dev/null || true
-    # Kill any running Passenger lsnode process
+    # Step 3 — Kill any running Passenger lsnode process
     - pkill -9 -f "lsnode:/home/aljadeedelectric/ucheck/" 2>/dev/null || true
-    # Install production dependencies only
+    # Step 4 — Install production dependencies
     - cd $DEPLOYPATH && NODE_ENV=production npm install --omit=dev --ignore-scripts 2>/dev/null || npm install --production --ignore-scripts
-    # Build optimized production bundle
+    # Step 5 — Build the optimized production bundle
     - cd $DEPLOYPATH && NODE_ENV=production npm run build
-    # Restore previous static chunks (preserves older chunks for in-flight browser tabs)
+    # Step 6 — Restore and MERGE old static chunks (older chunk files preserved for in-flight sessions)
     - mkdir -p $DEPLOYPATH/public/_next/static
     - cp -Rf /tmp/ucheck_static_backup/* $DEPLOYPATH/public/_next/static/ 2>/dev/null || true
-    # Copy fresh build static chunks into public/ for fallback stream handler
+    # Step 7 — Overlay fresh build chunks on top (newer files win, old files are kept)
     - /bin/cp -Rf $DEPLOYPATH/.next/static/* $DEPLOYPATH/public/_next/static/ 2>/dev/null || true
-    # Restart Phusion Passenger
+    # Step 8 — Restart Phusion Passenger
     - mkdir -p $DEPLOYPATH/tmp
     - touch $DEPLOYPATH/tmp/restart.txt

@@ -10,29 +10,33 @@
     RewriteEngine On
 </IfModule>
 
-# Cache-Control configuration to prevent chunk mismatches and accelerate static assets
 <IfModule mod_headers.c>
     Header set Access-Control-Allow-Origin "*"
-    
-    # Static immutable Next.js assets
-    <FilesMatch "\.(js|css|woff2|woff|ttf|png|jpg|jpeg|svg|ico)$">
+
+    # Static immutable Next.js chunks — long-lived cache (fingerprinted filenames)
+    <FilesMatch "\\.(js|css|woff2|woff|ttf|png|jpg|jpeg|svg|ico)$">
         Header set Cache-Control "public, max-age=31536000, immutable"
     </FilesMatch>
 
-    # Disable caching on HTML, dynamic JSON, manifests
-    <FilesMatch "\.(html|htm|json|txt|xml)$">
+    # Override: Next.js build manifests must never be cached
+    <FilesMatch "(_buildManifest|_ssgManifest|build-manifest|app-build-manifest|routes-manifest)\\.js(on)?$">
         Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
         Header set Pragma "no-cache"
-        Header set Expires 0
+        Header unset Expires
+    </FilesMatch>
+
+    # HTML, RSC payloads, and text responses — never cache
+    <FilesMatch "\\.(html|htm|rsc|txt|xml)$">
+        Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
     </FilesMatch>
 </IfModule>
 
-# Disable ModSecurity rule engine if ModSecurity is active on cPanel causing 400 Bad Request on _next static assets
+# Disable ModSecurity if active on cPanel causing 400 Bad Request on _next static assets
 <IfModule mod_security2.c>
     SecRuleEngine Off
 </IfModule>
 <IfModule mod_security.c>
     SecRuleEngine Off
 </IfModule>
-
-
