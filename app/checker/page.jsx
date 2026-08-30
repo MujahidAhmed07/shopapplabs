@@ -291,132 +291,170 @@ function CheckerPageContent() {
         )}
       </GlassCard>
 
-      {/* Progress & Category Filter Controls */}
-      <div className="space-y-4">
-        {isSearching && (
-          <div className="space-y-2">
-            <div className="flex justify-between text-xs text-slate-400">
-              <span>Checking platforms...</span>
-              <span>{progress}%</span>
-            </div>
-            <div className="w-full bg-slate-800/80 rounded-full h-1.5 overflow-hidden">
-              <div
-                className="progress-bar-animated h-full rounded-full transition-[width] duration-300 ease-out"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          </div>
-        )}
-
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => handleCategoryChange(cat.id)}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
-                  activeCategory === cat.id
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/30 scale-105'
-                    : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-3 text-xs">
-            <span className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/20">
-              {availableCount} Available
-            </span>
-            <span className="px-3 py-1.5 rounded-lg bg-rose-500/10 text-rose-400 font-semibold border border-rose-500/20">
-              {takenCount} Taken
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Results Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredPlatforms.map((platform) => {
-          const res = results[platform.id] || { status: 'LOADING' };
-          const isDomain = platform.category === 'domains' || platform.id.startsWith('domain_');
-          const domainLabel = username.replace(/_/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || username;
-          const tld = platform.id.startsWith('domain_') ? platform.id.split('_')[1] : 'com';
-          const formattedUrl = isDomain ? `https://${domainLabel}.${tld}` : platform.urlPattern.replace('{}', username);
-          const displayHandle = isDomain ? `${domainLabel}.${tld}` : `@${username}`;
-
-          return (
-            <GlassCard key={platform.id} className="p-5 flex flex-col justify-between space-y-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="font-bold text-white text-base flex items-center gap-2">
-                    {platform.name}
-                  </h3>
-                  <p className="text-slate-500 text-xs mt-0.5 font-mono">
-                    {displayHandle}
-                  </p>
+      {/* Active Results Section or Initial Search Guide */}
+      {hasSearched && username.trim() ? (
+        <>
+          {/* Progress & Category Filter Controls */}
+          <div className="space-y-4">
+            {isSearching && (
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs text-slate-400">
+                  <span>Checking platforms...</span>
+                  <span>{progress}%</span>
                 </div>
-                <ResultBadge status={res.status} message={res.message} />
+                <div className="w-full bg-slate-800/80 rounded-full h-1.5 overflow-hidden">
+                  <div
+                    className="progress-bar-animated h-full rounded-full transition-[width] duration-300 ease-out"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
+                {CATEGORIES.map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => handleCategoryChange(cat.id)}
+                    className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                      activeCategory === cat.id
+                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/30 scale-105'
+                        : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
               </div>
 
-              {res.full_name && (
-                <div className="text-xs bg-white/5 p-2.5 rounded-lg text-slate-300">
-                  <span className="text-slate-400 block text-[10px] uppercase font-semibold">Account Owner</span>
-                  {res.full_name}
-                </div>
-              )}
+              <div className="flex items-center gap-3 text-xs">
+                <span className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/20">
+                  {availableCount} Available
+                </span>
+                <span className="px-3 py-1.5 rounded-lg bg-rose-500/10 text-rose-400 font-semibold border border-rose-500/20">
+                  {takenCount} Taken
+                </span>
+              </div>
+            </div>
+          </div>
 
-              {/* Verified Available Alternatives for Taken Handles / Domains */}
-              {res.status === 'TAKEN' && (
-                <div className="text-xs bg-emerald-950/20 p-2.5 rounded-xl border border-emerald-500/20 space-y-1.5">
-                  <span className="text-emerald-400 text-[11px] font-semibold flex items-center gap-1">
-                    <Wand2 className="w-3 h-3 text-emerald-400" /> Verified Available {isDomain ? 'Domains' : 'Handles'}:
-                  </span>
-                  <div className="flex flex-wrap gap-1">
-                    {(verifiedPlatformSuggestions[platform.id] && verifiedPlatformSuggestions[platform.id].length > 0
-                      ? verifiedPlatformSuggestions[platform.id]
-                      : generateUsernameSuggestions(username, isDomain).slice(0, 3)
-                    ).map((alt) => (
-                      <button
-                        key={alt}
-                        type="button"
-                        onClick={() => { setUsername(alt); updateUrlAndSearch(alt, activeCategory); }}
-                        className="px-2 py-0.5 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-[11px] font-mono border border-emerald-500/30 transition-colors flex items-center gap-1 font-semibold"
-                      >
-                        <Check className="w-3 h-3 text-emerald-400" /> {isDomain ? `${alt}.${tld}` : `@${alt}`}
-                      </button>
-                    ))}
+          {/* Results Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredPlatforms.map((platform) => {
+              const res = results[platform.id] || { status: 'LOADING' };
+              const isDomain = platform.category === 'domains' || platform.id.startsWith('domain_');
+              const domainLabel = username.replace(/_/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || username;
+              const tld = platform.id.startsWith('domain_') ? platform.id.split('_')[1] : 'com';
+              const formattedUrl = isDomain ? `https://${domainLabel}.${tld}` : platform.urlPattern.replace('{}', username);
+              const displayHandle = isDomain ? `${domainLabel}.${tld}` : `@${username}`;
+
+              return (
+                <GlassCard key={platform.id} className="p-5 flex flex-col justify-between space-y-4">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="font-bold text-white text-base flex items-center gap-2">
+                        {platform.name}
+                      </h3>
+                      <p className="text-slate-500 text-xs mt-0.5 font-mono">
+                        {displayHandle}
+                      </p>
+                    </div>
+                    <ResultBadge status={res.status} message={res.message} />
                   </div>
-                </div>
-              )}
 
-              <div className="pt-3 border-t border-white/5 flex items-center justify-between text-xs">
-                <a
-                  href={res.url || formattedUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1"
-                >
-                  {isDomain ? 'Register / View' : 'Visit Link'} <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-
-                <button
-                  type="button"
-                  onClick={() => handleCopyLink(res.url || formattedUrl, platform.id)}
-                  className="text-slate-400 hover:text-white transition-colors flex items-center gap-1"
-                >
-                  {copiedId === platform.id ? (
-                    <span className="text-emerald-400 flex items-center gap-1"><Check className="w-3.5 h-3.5" /> Copied!</span>
-                  ) : (
-                    <span className="flex items-center gap-1"><Copy className="w-3.5 h-3.5" /> Copy URL</span>
+                  {res.full_name && (
+                    <div className="text-xs bg-white/5 p-2.5 rounded-lg text-slate-300">
+                      <span className="text-slate-400 block text-[10px] uppercase font-semibold">Account Owner</span>
+                      {res.full_name}
+                    </div>
                   )}
-                </button>
-              </div>
-            </GlassCard>
-          );
-        })}
-      </div>
+
+                  {/* Verified Available Alternatives for Taken Handles / Domains */}
+                  {res.status === 'TAKEN' && (
+                    <div className="text-xs bg-emerald-950/20 p-2.5 rounded-xl border border-emerald-500/20 space-y-1.5">
+                      <span className="text-emerald-400 text-[11px] font-semibold flex items-center gap-1">
+                        <Wand2 className="w-3 h-3 text-emerald-400" /> Verified Available {isDomain ? 'Domains' : 'Handles'}:
+                      </span>
+                      <div className="flex flex-wrap gap-1">
+                        {(verifiedPlatformSuggestions[platform.id] && verifiedPlatformSuggestions[platform.id].length > 0
+                          ? verifiedPlatformSuggestions[platform.id]
+                          : generateUsernameSuggestions(username, isDomain, 3)
+                        ).map((alt) => (
+                          <button
+                            key={alt}
+                            type="button"
+                            onClick={() => { setUsername(alt); updateUrlAndSearch(alt, activeCategory); }}
+                            className="px-2 py-0.5 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-[11px] font-mono border border-emerald-500/30 transition-colors flex items-center gap-1 font-semibold"
+                          >
+                            <Check className="w-3 h-3 text-emerald-400" /> {isDomain ? `${alt}.${tld}` : `@${alt}`}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="pt-3 border-t border-white/5 flex items-center justify-between text-xs">
+                    <a
+                      href={res.url || formattedUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1"
+                    >
+                      {isDomain ? 'Register / View' : 'Visit Link'} <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={() => handleCopyLink(res.url || formattedUrl, platform.id)}
+                      className="text-slate-400 hover:text-white transition-colors flex items-center gap-1"
+                    >
+                      {copiedId === platform.id ? (
+                        <span className="text-emerald-400 flex items-center gap-1"><Check className="w-3.5 h-3.5" /> Copied!</span>
+                      ) : (
+                        <span className="flex items-center gap-1"><Copy className="w-3.5 h-3.5" /> Copy URL</span>
+                      )}
+                    </button>
+                  </div>
+                </GlassCard>
+              );
+            })}
+          </div>
+        </>
+      ) : (
+        /* Empty State Prompt */
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-6">
+          <GlassCard className="p-6 space-y-3 text-center">
+            <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto">
+              <Sparkles className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-bold text-white">100+ Networks &amp; Domains</h3>
+            <p className="text-slate-400 text-xs leading-relaxed">
+              Check availability across Instagram, TikTok, X (Twitter), YouTube, GitHub, Discord, Twitch, and domain TLDs (.com, .io, .dev).
+            </p>
+          </GlassCard>
+
+          <GlassCard className="p-6 space-y-3 text-center">
+            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
+              <Wand2 className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-bold text-white">Smart Live Validation</h3>
+            <p className="text-slate-400 text-xs leading-relaxed">
+              When a username is taken, our engine automatically tests randomized alternative variations and returns verified available handles.
+            </p>
+          </GlassCard>
+
+          <GlassCard className="p-6 space-y-3 text-center">
+            <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center mx-auto">
+              <RefreshCw className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-bold text-white">Instant DNS &amp; API Search</h3>
+            <p className="text-slate-400 text-xs leading-relaxed">
+              Ultra-fast concurrent queries with Cloudflare DNS-over-HTTPS and direct platform endpoint verification.
+            </p>
+          </GlassCard>
+        </div>
+      )}
 
       <SeoFaq />
 
