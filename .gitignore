@@ -28,3 +28,7 @@ venv/
 Thumbs.db
 *.log
 server.log
+
+# Screenshots & generated images
+*.png
+!public/*.png
