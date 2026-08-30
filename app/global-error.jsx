@@ -15,11 +15,12 @@ export default function GlobalError({ error, reset }) {
 
     if (isChunkError) {
       const now = Date.now();
-      const lastReload = parseInt(sessionStorage.getItem('last_global_chunk_reload') || '0', 10);
-      if (now - lastReload > 15000) {
-        sessionStorage.setItem('last_global_chunk_reload', String(now));
-        const cleanUrl = window.location.href.split('#')[0];
-        window.location.href = cleanUrl;
+      const lastReload = parseInt(sessionStorage.getItem('__chunk_err_reload') || '0', 10);
+      if (now - lastReload > 20000) {
+        sessionStorage.setItem('__chunk_err_reload', String(now));
+        // Cache-bust the URL to force fresh HTML from server/CDN
+        const cleanUrl = window.location.href.split('?')[0].split('#')[0];
+        window.location.replace(cleanUrl + '?__r=' + now);
       }
     }
   }, [error]);
@@ -34,7 +35,7 @@ export default function GlobalError({ error, reset }) {
           </p>
           <button
             onClick={() => {
-              sessionStorage.removeItem('last_global_chunk_reload');
+              sessionStorage.removeItem('__chunk_err_reload');
               window.location.reload();
             }}
             className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition-all"

@@ -3,23 +3,27 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home/aljadeedelectric/ucheck
     - export NODE_ENV=production
-    # Step 1 — Backup ALL existing static chunks before anything is deleted
+    # Step 1 — Backup ALL existing static chunks before anything is touched
+    #         Old chunks must survive the build so in-flight browser sessions can still load them
     - mkdir -p /tmp/ucheck_static_backup 2>/dev/null || true
     - cp -Rf $DEPLOYPATH/public/_next/static/* /tmp/ucheck_static_backup/ 2>/dev/null || true
     - cp -Rf $DEPLOYPATH/.next/static/* /tmp/ucheck_static_backup/ 2>/dev/null || true
     # Step 2 — Pull latest source from GitHub
     - cd $DEPLOYPATH && git reset --hard HEAD && git clean -fd 2>/dev/null || true
-    # Step 3 — Kill any running Passenger lsnode process
+    # Step 3 — Kill any running Passenger lsnode process and wait for graceful shutdown
     - pkill -9 -f "lsnode:/home/aljadeedelectric/ucheck/" 2>/dev/null || true
-    # Step 4 — Install production dependencies
+    - sleep 2
+    # Step 4 — Remove stale .next/server so the old process cannot serve outdated RSC payloads
+    - rm -rf $DEPLOYPATH/.next/server
+    # Step 5 — Install production dependencies
     - cd $DEPLOYPATH && NODE_ENV=production npm install --omit=dev --ignore-scripts 2>/dev/null || npm install --production --ignore-scripts
-    # Step 5 — Build the optimized production bundle
+    # Step 6 — Build the optimized production bundle
     - cd $DEPLOYPATH && NODE_ENV=production npm run build
-    # Step 6 — Restore and MERGE old static chunks (older chunk files preserved for in-flight sessions)
+    # Step 7 — Restore and MERGE old static chunks (older chunk files preserved for in-flight sessions)
     - mkdir -p $DEPLOYPATH/public/_next/static
     - cp -Rf /tmp/ucheck_static_backup/* $DEPLOYPATH/public/_next/static/ 2>/dev/null || true
-    # Step 7 — Overlay fresh build chunks on top (newer files win, old files are kept)
+    # Step 8 — Overlay fresh build chunks on top (newer files overwrite, old files are kept)
     - /bin/cp -Rf $DEPLOYPATH/.next/static/* $DEPLOYPATH/public/_next/static/ 2>/dev/null || true
-    # Step 8 — Restart Phusion Passenger
+    # Step 9 — Restart Phusion Passenger
     - mkdir -p $DEPLOYPATH/tmp
     - touch $DEPLOYPATH/tmp/restart.txt

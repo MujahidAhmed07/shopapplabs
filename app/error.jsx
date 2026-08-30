@@ -18,19 +18,20 @@ export default function Error({ error, reset }) {
 
     if (isChunkError) {
       const now = Date.now();
-      const lastReload = parseInt(sessionStorage.getItem('last_chunk_error_reload') || '0', 10);
+      const lastReload = parseInt(sessionStorage.getItem('__chunk_err_reload') || '0', 10);
       
-      // Auto reload if not reloaded in the last 15 seconds to break infinite reload loops
-      if (now - lastReload > 15000) {
-        sessionStorage.setItem('last_chunk_error_reload', String(now));
-        const cleanUrl = window.location.href.split('#')[0];
-        window.location.href = cleanUrl;
+      // Auto reload if not reloaded in the last 20 seconds to break infinite reload loops
+      if (now - lastReload > 20000) {
+        sessionStorage.setItem('__chunk_err_reload', String(now));
+        // Cache-bust the URL to force fresh HTML from server/CDN
+        const cleanUrl = window.location.href.split('?')[0].split('#')[0];
+        window.location.replace(cleanUrl + '?__r=' + now);
       }
     }
   }, [error]);
 
   const handleReload = () => {
-    sessionStorage.removeItem('last_chunk_error_reload');
+    sessionStorage.removeItem('__chunk_err_reload');
     window.location.reload();
   };
 

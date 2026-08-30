@@ -142,30 +142,40 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
+                var KEY = '__chunk_err_reload';
+                var COOLDOWN = 20000;
+
                 function isChunkError(msg) {
                   return (
                     msg.indexOf('ChunkLoadError') !== -1 ||
                     msg.indexOf('Loading chunk') !== -1 ||
                     msg.indexOf('Failed to fetch dynamically imported module') !== -1 ||
                     msg.indexOf('Importing a module script failed') !== -1 ||
-                    msg.indexOf('Loading CSS chunk') !== -1 ||
-                    msg.indexOf('Cannot read properties of undefined') !== -1
+                    msg.indexOf('Loading CSS chunk') !== -1
                   );
                 }
 
                 function tryReload(reason) {
                   try {
                     var now = Date.now();
-                    var key = 'chunk_reload_at';
-                    var lastReload = parseInt(sessionStorage.getItem(key) || '0', 10);
-                    // Only reload if we haven't reloaded in the last 20s (anti-loop)
-                    if (now - lastReload > 20000) {
-                      sessionStorage.setItem(key, String(now));
-                      // Cache-bust the URL to force fresh HTML from server
-                      var url = window.location.href.split('?')[0].split('#')[0];
-                      var sep = url.indexOf('?') === -1 ? '?' : '&';
-                      window.location.replace(url + sep + '__r=' + now);
-                    }
+                    var lastReload = parseInt(sessionStorage.getItem(KEY) || '0', 10);
+                    if (now - lastReload < COOLDOWN) return;
+                    sessionStorage.setItem(KEY, String(now));
+
+                    // Strip existing query/fragment to get the clean page URL
+                    var cleanUrl = window.location.href.split('?')[0].split('#')[0];
+
+                    // Fetch fresh HTML first to confirm the server has a new build,
+                    // then navigate to the cache-busted URL
+                    fetch(cleanUrl, { cache: 'no-store', credentials: 'same-origin' })
+                      .then(function(r) { return r.text(); })
+                      .then(function() {
+                        window.location.replace(cleanUrl + '?__r=' + now);
+                      })
+                      .catch(function() {
+                        // Fallback: reload even if fetch fails
+                        window.location.replace(cleanUrl + '?__r=' + now);
+                      });
                   } catch(e) {}
                 }
 
@@ -179,7 +189,7 @@ export default function RootLayout({ children }) {
                 window.addEventListener('error', handleError, true);
                 window.addEventListener('unhandledrejection', handleError, true);
 
-                // Also watch for failed <script src> tags via MutationObserver
+                // Watch for failed <script src> tags loaded from /_next/static/chunks/
                 if (typeof MutationObserver !== 'undefined') {
                   var observer = new MutationObserver(function(mutations) {
                     mutations.forEach(function(m) {
