@@ -38,7 +38,7 @@
       "static/chunks/main-app-ebc267ca8e803733.js",
       "static/chunks/972-b325aaa66f4acca2.js",
       "static/chunks/448-cace0ba5413ff8e7.js",
-      "static/chunks/273-4508161049b3225f.js",
+      "static/chunks/273-f165ba6248c26063.js",
       "static/chunks/app/[platformSlug]/page-6097bbb33785a786.js"
     ],
     "/[platformSlug]-username-checker/page": [
@@ -48,7 +48,7 @@
       "static/chunks/main-app-ebc267ca8e803733.js",
       "static/chunks/972-b325aaa66f4acca2.js",
       "static/chunks/448-cace0ba5413ff8e7.js",
-      "static/chunks/273-4508161049b3225f.js",
+      "static/chunks/273-f165ba6248c26063.js",
       "static/chunks/app/[platformSlug]-username-checker/page-326cf26124d228ce.js"
     ],
     "/domain-availability-checker/page": [
@@ -58,16 +58,8 @@
       "static/chunks/main-app-ebc267ca8e803733.js",
       "static/chunks/972-b325aaa66f4acca2.js",
       "static/chunks/448-cace0ba5413ff8e7.js",
-      "static/chunks/273-4508161049b3225f.js",
+      "static/chunks/273-f165ba6248c26063.js",
       "static/chunks/app/domain-availability-checker/page-4cfef01ff133f555.js"
-    ],
-    "/platforms/page": [
-      "static/chunks/webpack-cdaf9171b4e4094c.js",
-      "static/chunks/fd9d1056-9123c93caf233aef.js",
-      "static/chunks/117-48dd1562a62288a2.js",
-      "static/chunks/main-app-ebc267ca8e803733.js",
-      "static/chunks/972-b325aaa66f4acca2.js",
-      "static/chunks/app/platforms/page-5d50bf6307a95423.js"
     ],
     "/products/page": [
       "static/chunks/webpack-cdaf9171b4e4094c.js",
@@ -76,6 +68,14 @@
       "static/chunks/main-app-ebc267ca8e803733.js",
       "static/chunks/972-b325aaa66f4acca2.js",
       "static/chunks/app/products/page-2a0e62564e7081d6.js"
+    ],
+    "/platforms/page": [
+      "static/chunks/webpack-cdaf9171b4e4094c.js",
+      "static/chunks/fd9d1056-9123c93caf233aef.js",
+      "static/chunks/117-48dd1562a62288a2.js",
+      "static/chunks/main-app-ebc267ca8e803733.js",
+      "static/chunks/972-b325aaa66f4acca2.js",
+      "static/chunks/app/platforms/page-5d50bf6307a95423.js"
     ],
     "/page": [
       "static/chunks/webpack-cdaf9171b4e4094c.js",
@@ -92,7 +92,7 @@
       "static/chunks/117-48dd1562a62288a2.js",
       "static/chunks/main-app-ebc267ca8e803733.js",
       "static/chunks/448-cace0ba5413ff8e7.js",
-      "static/chunks/app/checker/page-ce57da5c7dc80ed5.js"
+      "static/chunks/app/checker/page-01823b9657a492a2.js"
     ],
     "/checker/layout": [
       "static/chunks/webpack-cdaf9171b4e4094c.js",

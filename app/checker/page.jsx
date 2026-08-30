@@ -14,13 +14,14 @@ function CheckerPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   
-  const initialUsername = searchParams.get('u') || searchParams.get('username') || 'shopapp';
+  const initialUsername = searchParams.get('u') || searchParams.get('username') || '';
   const initialCat = searchParams.get('cat') || 'all';
 
   const [username, setUsername] = useState(initialUsername);
   const [activeCategory, setActiveCategory] = useState(initialCat);
   const [results, setResults] = useState({});
   const [isSearching, setIsSearching] = useState(false);
+  const [hasSearched, setHasSearched] = useState(Boolean(initialUsername.trim()));
   const [progress, setProgress] = useState(0);
   const [copiedId, setCopiedId] = useState(null);
   const [shareCopied, setShareCopied] = useState(false);
@@ -48,6 +49,7 @@ function CheckerPageContent() {
     const cleanQuery = query.trim().toLowerCase().replace(/^@/, '');
     if (!cleanQuery) return;
 
+    setHasSearched(true);
     setIsSearching(true);
     setProgress(0);
     setVerifiedPlatformSuggestions({});
@@ -102,18 +104,18 @@ function CheckerPageContent() {
 
   const updateUrlAndSearch = (newUsername, newCategory) => {
     const cleanQuery = newUsername.trim().toLowerCase().replace(/^@/, '');
+    if (!cleanQuery) return;
+
     router.replace(`/checker?u=${encodeURIComponent(cleanQuery)}&cat=${encodeURIComponent(newCategory)}`);
     
-    if (cleanQuery) {
-      setSearchHistory((prevHistory) => {
-        const filtered = prevHistory.filter((item) => item !== cleanQuery);
-        const updated = [cleanQuery, ...filtered].slice(0, 5);
-        try {
-          localStorage.setItem('username_search_history', JSON.stringify(updated));
-        } catch (e) {}
-        return updated;
-      });
-    }
+    setSearchHistory((prevHistory) => {
+      const filtered = prevHistory.filter((item) => item !== cleanQuery);
+      const updated = [cleanQuery, ...filtered].slice(0, 5);
+      try {
+        localStorage.setItem('username_search_history', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
     runCheck(cleanQuery, newCategory);
   };
 
@@ -126,20 +128,26 @@ function CheckerPageContent() {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    updateUrlAndSearch(username, activeCategory);
+    if (username.trim()) {
+      updateUrlAndSearch(username, activeCategory);
+    }
   };
 
   const handleCategoryChange = (catId) => {
     setActiveCategory(catId);
-    updateUrlAndSearch(username, catId);
+    if (username.trim()) {
+      updateUrlAndSearch(username, catId);
+    }
   };
 
   useEffect(() => {
-    const u = searchParams.get('u') || searchParams.get('username') || 'shopapp';
+    const u = searchParams.get('u') || searchParams.get('username') || '';
     const cat = searchParams.get('cat') || 'all';
     setUsername(u);
     setActiveCategory(cat);
-    runCheck(u, cat);
+    if (u.trim()) {
+      runCheck(u, cat);
+    }
   }, [searchParams, runCheck]);
 
   const handleCopyLink = (url, id) => {
@@ -179,14 +187,14 @@ function CheckerPageContent() {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter username (e.g. shopapp, brandname)"
+              placeholder="Enter desired username or domain (e.g. yourbrand)..."
               className="w-full bg-slate-900/90 border border-white/10 rounded-xl pl-12 pr-4 py-4 text-white placeholder-slate-500 font-medium focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all text-base"
             />
           </div>
 
           <button
             type="submit"
-            disabled={isSearching}
+            disabled={isSearching || !username.trim()}
             className="px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 text-base transition-all disabled:opacity-50"
           >
             {isSearching ? (
@@ -230,54 +238,55 @@ function CheckerPageContent() {
             )}
           </div>
 
-          <button
-            type="button"
-            onClick={handleShareSearchUrl}
-            className="px-3 py-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/20 flex items-center gap-1.5 self-start sm:self-auto transition-all"
-          >
-            {shareCopied ? (
-              <>
-                <Check className="w-3.5 h-3.5 text-emerald-400" /> Share Link Copied!
-              </>
-            ) : (
-              <>
-                <Share2 className="w-3.5 h-3.5" /> Share Search URL
-              </>
-            )}
-          </button>
+          {hasSearched && (
+            <button
+              type="button"
+              onClick={handleShareSearchUrl}
+              className="px-3 py-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/20 flex items-center gap-1.5 self-start sm:self-auto transition-all"
+            >
+              {shareCopied ? (
+                <>
+                  <Check className="w-3.5 h-3.5 text-emerald-400" /> Share Link Copied!
+                </>
+              ) : (
+                <>
+                  <Share2 className="w-3.5 h-3.5" /> Share Search URL
+                </>
+              )}
+            </button>
+          )}
         </div>
 
         {/* Smart Verified Available Handle Alternatives Bar */}
-        {username && (
+        {hasSearched && username.trim() && (
           <div className="mt-4 pt-4 border-t border-white/5 space-y-2">
             <div className="flex items-center justify-between text-xs font-semibold">
               <span className="text-emerald-400 flex items-center gap-1.5 font-bold">
-                <Wand2 className="w-3.5 h-3.5 text-emerald-400" />
-                Verified Available Across All Major Platforms:
+                <Wand2 className="w-3 h-3 text-emerald-400" />
+                Verified Available Across Major Platforms:
               </span>
               {isCheckingGlobal && (
                 <span className="text-slate-400 text-[11px] flex items-center gap-1">
-                  <Loader2 className="w-3 h-3 animate-spin text-emerald-400" /> Verifying all platforms...
+                  <Loader2 className="w-3 h-3 animate-spin text-emerald-400" /> Checking available alternatives...
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-2 flex-wrap text-xs">
-              {(globalVerifiedSuggestions.length > 0
-                ? globalVerifiedSuggestions
-                : generateUsernameSuggestions(username).slice(0, 4)
-              ).map((sugg) => (
-                <button
-                  key={sugg}
-                  type="button"
-                  onClick={() => { setUsername(sugg); updateUrlAndSearch(sugg, activeCategory); }}
-                  className="px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5 font-semibold"
-                >
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
-                  @{sugg}
-                  <span className="text-[10px] uppercase px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-sans">Available All</span>
-                </button>
-              ))}
-            </div>
+            {globalVerifiedSuggestions.length > 0 && (
+              <div className="flex items-center gap-2 flex-wrap text-xs">
+                {globalVerifiedSuggestions.map((sugg) => (
+                  <button
+                    key={sugg}
+                    type="button"
+                    onClick={() => { setUsername(sugg); updateUrlAndSearch(sugg, activeCategory); }}
+                    className="px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5 font-semibold"
+                  >
+                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    @{sugg}
+                    <span className="text-[10px] uppercase px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-sans">Available</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </GlassCard>

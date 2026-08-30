@@ -10,9 +10,10 @@ import { checkSinglePlatform } from '@/lib/services/apiClient';
 import { generateUsernameSuggestions, getVerifiedAvailableSuggestions } from '@/lib/utils/usernameSuggestions';
 
 export default function SinglePlatformClient({ platformKey, platformId, platformMeta, details, platformSlug }) {
-  const [username, setUsername] = useState('shopapp');
+  const [username, setUsername] = useState('');
   const [result, setResult] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const [copied, setCopied] = useState(false);
   const [verifiedSuggestions, setVerifiedSuggestions] = useState([]);
   const [isCheckingSuggestions, setIsCheckingSuggestions] = useState(false);
@@ -21,9 +22,11 @@ export default function SinglePlatformClient({ platformKey, platformId, platform
     const query = targetUsername.trim().toLowerCase().replace(/^@/, '');
     if (!query) return;
 
+    setHasSearched(true);
     setIsSearching(true);
     setResult({ status: 'LOADING' });
     setVerifiedSuggestions([]);
+    setIsCheckingSuggestions(false);
 
     const res = await checkSinglePlatform(platformId, query);
     setResult(res);
@@ -40,11 +43,15 @@ export default function SinglePlatformClient({ platformKey, platformId, platform
 
   const handleSearch = (e) => {
     if (e) e.preventDefault();
-    triggerSearch(username);
+    if (username.trim()) {
+      triggerSearch(username);
+    }
   };
 
   useEffect(() => {
-    handleSearch();
+    if (username.trim()) {
+      handleSearch();
+    }
   }, [platformId]);
 
   const handleCopy = (url) => {
@@ -95,14 +102,14 @@ export default function SinglePlatformClient({ platformKey, platformId, platform
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder={isDomain ? `Enter domain name (e.g. shopapp or shop-app)` : `Enter ${platformMeta.name} handle (e.g. shopapp)`}
+              placeholder={isDomain ? "Enter domain name (e.g. yourbrand or brand-name)..." : `Enter ${platformMeta.name} handle (e.g. yourbrand)...`}
               className="w-full bg-slate-900/90 border border-white/10 rounded-xl pl-12 pr-4 py-4 text-white placeholder-slate-500 font-medium focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all text-base"
             />
           </div>
 
           <button
             type="submit"
-            disabled={isSearching}
+            disabled={isSearching || !username.trim()}
             className="px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 text-base transition-all disabled:opacity-50"
           >
             {isSearching ? (
@@ -120,7 +127,7 @@ export default function SinglePlatformClient({ platformKey, platformId, platform
         </form>
 
         {/* Live Result Display */}
-        {result && (
+        {hasSearched && result && (
           <div className="mt-6 pt-6 border-t border-white/10 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-white/5 border border-white/5">
               <div>
