@@ -1,14 +1,14 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/[platformSlug]/page": "app/[platformSlug]/page.js",
   "/[platformSlug]-username-checker/page": "app/[platformSlug]-username-checker/page.js",
+  "/api/v1/products/route": "app/api/v1/products/route.js",
+  "/[platformSlug]/page": "app/[platformSlug]/page.js",
   "/api/v1/checker/check/[platform]/route": "app/api/v1/checker/check/[platform]/route.js",
   "/domain-availability-checker/page": "app/domain-availability-checker/page.js",
-  "/api/v1/products/route": "app/api/v1/products/route.js",
   "/robots.txt/route": "app/robots.txt/route.js",
   "/sitemap.xml/route": "app/sitemap.xml/route.js",
-  "/platforms/page": "app/platforms/page.js",
   "/products/page": "app/products/page.js",
+  "/platforms/page": "app/platforms/page.js",
   "/page": "app/page.js",
   "/checker/page": "app/checker/page.js"
 }
