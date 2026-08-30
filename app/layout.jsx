@@ -142,15 +142,27 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
-                window.addEventListener('error', function(e) {
-                  var msg = e && (e.message || (e.error && e.error.message) || '');
-                  if (msg && (msg.indexOf('ChunkLoadError') !== -1 || msg.indexOf('Loading chunk') !== -1)) {
-                    if (!window.sessionStorage.getItem('chunk_reload_attempt')) {
-                      window.sessionStorage.setItem('chunk_reload_attempt', 'true');
-                      window.location.reload(true);
+                function handleChunkError(e) {
+                  var err = e && (e.error || e.reason || e);
+                  var msg = (err && (err.message || err.name || String(err))) || '';
+                  var isChunk =
+                    msg.indexOf('ChunkLoadError') !== -1 ||
+                    msg.indexOf('Loading chunk') !== -1 ||
+                    msg.indexOf('Failed to fetch dynamically imported module') !== -1 ||
+                    msg.indexOf('Importing a module script failed') !== -1;
+                  
+                  if (isChunk) {
+                    var now = Date.now();
+                    var lastReload = parseInt(window.sessionStorage.getItem('last_chunk_error_reload') || '0', 10);
+                    if (now - lastReload > 12000) {
+                      window.sessionStorage.setItem('last_chunk_error_reload', String(now));
+                      var cleanUrl = window.location.href.split('#')[0];
+                      window.location.href = cleanUrl;
                     }
                   }
-                }, true);
+                }
+                window.addEventListener('error', handleChunkError, true);
+                window.addEventListener('unhandledrejection', handleChunkError, true);
               })();
             `
           }}

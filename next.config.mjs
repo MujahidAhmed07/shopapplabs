@@ -38,6 +38,28 @@ const nextConfig = {
         permanent: true,
       }
     ];
+  },
+  async headers() {
+    return [
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          }
+        ]
+      },
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on'
+          }
+        ]
+      }
+    ];
   }
 };
 

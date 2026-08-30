@@ -2,9 +2,12 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/aljadeedelectric/ucheck
+    - mkdir -p /tmp/ucheck_static_backup 2>/dev/null || true
+    - cp -Rf $DEPLOYPATH/public/_next/static/* /tmp/ucheck_static_backup/ 2>/dev/null || true
     - cd $DEPLOYPATH && git reset --hard HEAD && git clean -fd 2>/dev/null || true
     - pkill -9 -f "lsnode:/home/aljadeedelectric/ucheck/" 2>/dev/null || true
     - mkdir -p $DEPLOYPATH/public/_next/static
+    - cp -Rf /tmp/ucheck_static_backup/* $DEPLOYPATH/public/_next/static/ 2>/dev/null || true
     - /bin/cp -Rf $DEPLOYPATH/.next/static/* $DEPLOYPATH/public/_next/static/ 2>/dev/null || true
     - mkdir -p $DEPLOYPATH/tmp
     - touch $DEPLOYPATH/tmp/restart.txt

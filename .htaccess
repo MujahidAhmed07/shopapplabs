@@ -10,11 +10,18 @@
     RewriteEngine On
 </IfModule>
 
-# Prevent browser from caching HTML pages so chunk hash mismatches never happen
+# Cache-Control configuration to prevent chunk mismatches and accelerate static assets
 <IfModule mod_headers.c>
     Header set Access-Control-Allow-Origin "*"
-    <FilesMatch "\.(html|htm)$">
-        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    
+    # Static immutable Next.js assets
+    <FilesMatch "\.(js|css|woff2|woff|ttf|png|jpg|jpeg|svg|ico)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+
+    # Disable caching on HTML, dynamic JSON, manifests
+    <FilesMatch "\.(html|htm|json|txt|xml)$">
+        Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
         Header set Pragma "no-cache"
         Header set Expires 0
     </FilesMatch>

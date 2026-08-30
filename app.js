@@ -153,11 +153,17 @@ app.prepare().then(() => {
         } catch (e) {}
       }
 
-      // Set anti-caching headers ONLY for HTML page documents (not static assets or extension files)
-      if (!pathname.startsWith('/_next/') && !pathname.startsWith('/api/') && !pathname.includes('.')) {
-        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0');
+      // Set anti-caching headers for HTML page documents & Next.js RSC requests to prevent stale chunk mismatches
+      if (
+        (!pathname.startsWith('/_next/') && !pathname.startsWith('/api/') && !pathname.includes('.')) ||
+        (parsedUrl.query && typeof parsedUrl.query._rsc !== 'undefined')
+      ) {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0');
         res.setHeader('Pragma', 'no-cache');
         res.setHeader('Expires', '0');
+        res.setHeader('Surrogate-Control', 'no-store');
+        res.setHeader('CDN-Cache-Control', 'no-store');
+        res.setHeader('Cloudflare-CDN-Cache-Control', 'no-store');
       }
 
       await handle(req, res, parsedUrl);
