@@ -20,7 +20,8 @@ const PLATFORM_RULES_TABLE = [
   { platform: 'GitHub', length: '1 – 39 chars', allowed: 'Alphanumeric, single hyphens', disallowed: 'Consecutive hyphens, start/end with hyphen' },
   { platform: 'Discord', length: '2 – 32 chars', allowed: 'Lowercase letters, numbers, underscores, dots', disallowed: 'Uppercase letters, consecutive dots' },
   { platform: 'Twitch', length: '4 – 25 chars', allowed: 'Alphanumeric, underscores', disallowed: 'Special characters, leading underscores' },
-  { platform: 'Reddit', length: '3 – 20 chars', allowed: 'Letters, numbers, dashes, underscores', disallowed: 'Spaces, symbols' }
+  { platform: 'Reddit', length: '3 – 20 chars', allowed: 'Letters, numbers, dashes, underscores', disallowed: 'Spaces, symbols' },
+  { platform: 'Domain TLDs (.com, .io, .dev)', length: '1 – 63 chars', allowed: 'Letters, numbers, hyphens (-)', disallowed: 'Underscores (_), spaces, symbols, start/end hyphen' }
 ];
 
 export default function HomePage() {

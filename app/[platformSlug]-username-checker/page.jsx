@@ -90,6 +90,7 @@ const DEDICATED_PLATFORM_DETAILS = {
     subtitle: "Perform live DNS lookup across top-level domain extensions with 1-click registration.",
     guidelines: [
       "Supports .com, .io, .dev, .org, .net, .co, .ai domain extensions",
+      "Domains can only contain letters, numbers, and hyphens (underscores are never allowed in domain names)",
       "Instant Cloudflare DNS A and NS record resolution",
       "Direct registration link to Namecheap when domain is available"
     ]

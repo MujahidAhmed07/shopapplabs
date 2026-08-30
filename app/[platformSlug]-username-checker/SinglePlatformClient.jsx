@@ -53,6 +53,11 @@ export default function SinglePlatformClient({ platformKey, platformId, platform
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const isDomain = platformId.startsWith('domain_') || platformKey === 'domain' || platformKey === 'domain-availability';
+  const cleanDomainLabel = username.replace(/_/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || username;
+  const tld = platformId.startsWith('domain_') ? platformId.split('_')[1] : 'com';
+  const displayTarget = isDomain ? `${cleanDomainLabel}.${tld}` : `@${username.replace(/^@/, '')}`;
+
   return (
     <div className="max-w-4xl mx-auto py-10 px-2 md:px-6 space-y-12">
       
@@ -90,7 +95,7 @@ export default function SinglePlatformClient({ platformKey, platformId, platform
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder={`Enter ${platformMeta.name} handle (e.g. shopapp)`}
+              placeholder={isDomain ? `Enter domain name (e.g. shopapp or shop-app)` : `Enter ${platformMeta.name} handle (e.g. shopapp)`}
               className="w-full bg-slate-900/90 border border-white/10 rounded-xl pl-12 pr-4 py-4 text-white placeholder-slate-500 font-medium focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all text-base"
             />
           </div>
@@ -120,7 +125,7 @@ export default function SinglePlatformClient({ platformKey, platformId, platform
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-white/5 border border-white/5">
               <div>
                 <span className="text-xs text-slate-400 font-mono block">Query Target</span>
-                <span className="text-lg font-bold text-white font-mono">@{username.replace(/^@/, '')}</span>
+                <span className="text-lg font-bold text-white font-mono">{displayTarget}</span>
               </div>
               <ResultBadge status={result.status} message={result.message} />
             </div>
@@ -132,7 +137,7 @@ export default function SinglePlatformClient({ platformKey, platformId, platform
               </div>
             )}
 
-            {/* Pretty Available Handle Suggestions */}
+            {/* Pretty Available Handle / Domain Suggestions */}
             {result.status === 'TAKEN' && (
               <div className="p-4 rounded-xl bg-emerald-950/30 border border-emerald-500/20 space-y-2.5">
                 <div className="flex items-center justify-between text-xs font-semibold">
@@ -142,7 +147,7 @@ export default function SinglePlatformClient({ platformKey, platformId, platform
                   </span>
                   {isCheckingSuggestions && (
                     <span className="text-slate-400 text-[11px] flex items-center gap-1">
-                      <Loader2 className="w-3 h-3 animate-spin text-emerald-400" /> Verifying handles...
+                      <Loader2 className="w-3 h-3 animate-spin text-emerald-400" /> Verifying...
                     </span>
                   )}
                 </div>
@@ -157,7 +162,7 @@ export default function SinglePlatformClient({ platformKey, platformId, platform
                         className="px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5 font-semibold"
                       >
                         <Check className="w-3.5 h-3.5 text-emerald-400" />
-                        @{sugg}
+                        {isDomain ? `${sugg}.${tld}` : `@${sugg}`}
                         <span className="text-[10px] uppercase px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-sans">Available</span>
                       </button>
                     ))}
@@ -166,7 +171,7 @@ export default function SinglePlatformClient({ platformKey, platformId, platform
 
                 {!isCheckingSuggestions && verifiedSuggestions.length === 0 && (
                   <div className="flex items-center gap-2 flex-wrap text-xs">
-                    {generateUsernameSuggestions(username).slice(0, 4).map((sugg) => (
+                    {generateUsernameSuggestions(username, isDomain).slice(0, 4).map((sugg) => (
                       <button
                         key={sugg}
                         type="button"
@@ -174,7 +179,7 @@ export default function SinglePlatformClient({ platformKey, platformId, platform
                         className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 font-mono transition-all hover:scale-105 active:scale-95 flex items-center gap-1"
                       >
                         <Sparkles className="w-3 h-3 text-indigo-400" />
-                        @{sugg}
+                        {isDomain ? `${sugg}.${tld}` : `@${sugg}`}
                       </button>
                     ))}
                   </div>
