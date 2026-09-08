@@ -1,19 +1,19 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/aljadeedelectric/ucheck
+    - export DEPLOYPATH=/home/aljadeedelectric/usercheck
     - export NODE_ENV=production
     # Step 1 — Backup ALL existing static chunks before anything is touched
-    - mkdir -p /tmp/ucheck_static_backup 2>/dev/null || true
-    - cp -Rf $DEPLOYPATH/static-fallback/* /tmp/ucheck_static_backup/ 2>/dev/null || true
-    - cp -Rf $DEPLOYPATH/.next/static/* /tmp/ucheck_static_backup/ 2>/dev/null || true
-    - cp -Rf $DEPLOYPATH/public/_next/static/* /tmp/ucheck_static_backup/ 2>/dev/null || true
+    - mkdir -p /tmp/usercheck_static_backup 2>/dev/null || true
+    - cp -Rf $DEPLOYPATH/static-fallback/* /tmp/usercheck_static_backup/ 2>/dev/null || true
+    - cp -Rf $DEPLOYPATH/.next/static/* /tmp/usercheck_static_backup/ 2>/dev/null || true
+    - cp -Rf $DEPLOYPATH/public/_next/static/* /tmp/usercheck_static_backup/ 2>/dev/null || true
     # Step 2 — Remove conflicting public/_next folder so Next.js build never aborts
     - rm -rf $DEPLOYPATH/public/_next 2>/dev/null || true
     # Step 3 — Force-clean working directory and pull latest source
     - cd $DEPLOYPATH && git fetch origin && git reset --hard origin/main && git clean -fdx -e node_modules -e .next -e static-fallback -e tmp -e server.log 2>/dev/null || true
     # Step 4 — Kill any running Passenger lsnode process
-    - pkill -9 -f "lsnode:/home/aljadeedelectric/ucheck/" 2>/dev/null || true
+    - pkill -9 -f "lsnode:/home/aljadeedelectric/usercheck/" 2>/dev/null || true
     - sleep 2
     # Step 5 — Install production dependencies (Tailwind & PostCSS are now in dependencies)
     - cd $DEPLOYPATH && npm install --omit=dev --ignore-scripts 2>/dev/null || npm install --production --ignore-scripts
@@ -21,8 +21,10 @@ deployment:
     - cd $DEPLOYPATH && rm -rf public/_next && npm run build
     # Step 7 — Restore and MERGE old static chunks into static-fallback (preserved for in-flight sessions)
     - mkdir -p $DEPLOYPATH/static-fallback
-    - cp -Rf /tmp/ucheck_static_backup/* $DEPLOYPATH/static-fallback/ 2>/dev/null || true
+    - cp -Rf /tmp/usercheck_static_backup/* $DEPLOYPATH/static-fallback/ 2>/dev/null || true
     - cp -Rf $DEPLOYPATH/.next/static/* $DEPLOYPATH/static-fallback/ 2>/dev/null || true
-    # Step 8 — Restart Phusion Passenger
+    # Step 8 — Ensure all directory traversal permissions (0755) across .next, public, static-fallback
+    - chmod -R 755 $DEPLOYPATH/.next $DEPLOYPATH/public $DEPLOYPATH/static-fallback 2>/dev/null || true
+    # Step 9 — Restart Phusion Passenger
     - mkdir -p $DEPLOYPATH/tmp
     - touch $DEPLOYPATH/tmp/restart.txt

@@ -54,9 +54,37 @@ writeToLog('INFO', '=== Server Process Started ===');
 writeToLog('INFO', `Node version: ${process.version}, Platform: ${process.platform}`);
 writeToLog('INFO', `Current directory: ${__dirname}`);
 
-// Fast lightweight permission check for top-level folders
-try { if (fs.existsSync(path.join(__dirname, '.next'))) fs.chmodSync(path.join(__dirname, '.next'), 0o755); } catch (e) {}
-try { if (fs.existsSync(path.join(__dirname, 'public'))) fs.chmodSync(path.join(__dirname, 'public'), 0o755); } catch (e) {}
+// Recursively ensure all directories have 0755 executable/traversal permissions and files have 0644
+function ensurePermissions(dirPath) {
+  try {
+    if (!fs.existsSync(dirPath)) return;
+    const stat = fs.statSync(dirPath);
+    if (stat.isDirectory()) {
+      try { fs.chmodSync(dirPath, 0o755); } catch (e) {}
+      const entries = fs.readdirSync(dirPath);
+      for (const entry of entries) {
+        ensurePermissions(path.join(dirPath, entry));
+      }
+    } else if (stat.isFile()) {
+      try { fs.chmodSync(dirPath, 0o644); } catch (e) {}
+    }
+  } catch (err) {}
+}
+
+try {
+  if (process.platform === 'linux') {
+    const { execSync } = require('child_process');
+    try { execSync('chmod -R 755 "' + path.join(__dirname, '.next') + '" 2>/dev/null'); } catch (e) {}
+    try { execSync('chmod -R 755 "' + path.join(__dirname, 'public') + '" 2>/dev/null'); } catch (e) {}
+    try { execSync('chmod -R 755 "' + path.join(__dirname, 'static-fallback') + '" 2>/dev/null'); } catch (e) {}
+  }
+} catch (e) {}
+
+try {
+  ensurePermissions(path.join(__dirname, '.next'));
+  ensurePermissions(path.join(__dirname, 'public'));
+  ensurePermissions(path.join(__dirname, 'static-fallback'));
+} catch (e) {}
 
 const dev = false;
 const app = next({ dev, dir: __dirname });
