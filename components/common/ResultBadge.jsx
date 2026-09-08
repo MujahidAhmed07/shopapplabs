@@ -29,13 +29,25 @@ export default function ResultBadge({ status, message }) {
     );
   }
 
+  if (status === 'INVALID') {
+    return (
+      <span
+        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-500/15 text-red-400 border border-red-500/30 animate-badge"
+        title={message || 'Invalid username syntax'}
+      >
+        <AlertCircle className="w-3.5 h-3.5" />
+        INVALID
+      </span>
+    );
+  }
+
   return (
     <span
-      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30 animate-badge"
-      title={message || ''}
+      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30 animate-badge cursor-help"
+      title={message || 'Platform anti-bot wall active. Direct 1-click check recommended.'}
     >
       <AlertCircle className="w-3.5 h-3.5" />
-      {status || 'UNKNOWN'}
+      MANUAL CHECK
     </span>
   );
 }
