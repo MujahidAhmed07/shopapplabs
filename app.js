@@ -80,6 +80,26 @@ try {
   }
 } catch (e) {}
 
+// Clean up any stale build directories in .next/static that do not match the current BUILD_ID
+try {
+  const buildIdFile = path.join(__dirname, '.next', 'BUILD_ID');
+  if (fs.existsSync(buildIdFile)) {
+    const currentBuildId = fs.readFileSync(buildIdFile, 'utf8').trim();
+    const staticDir = path.join(__dirname, '.next', 'static');
+    if (fs.existsSync(staticDir)) {
+      const items = fs.readdirSync(staticDir);
+      for (const item of items) {
+        if (item !== 'chunks' && item !== 'css' && item !== 'media' && item !== currentBuildId) {
+          try {
+            fs.rmSync(path.join(staticDir, item), { recursive: true, force: true });
+            writeToLog('INFO', `Cleaned up stale build folder: ${item}`);
+          } catch (e) {}
+        }
+      }
+    }
+  }
+} catch (e) {}
+
 try {
   ensurePermissions(path.join(__dirname, '.next'));
   ensurePermissions(path.join(__dirname, 'public'));
