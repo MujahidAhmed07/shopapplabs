@@ -5,22 +5,24 @@ deployment:
     - export NODE_ENV=production
     # Step 1 — Backup ALL existing static chunks before anything is touched
     - mkdir -p /tmp/ucheck_static_backup 2>/dev/null || true
-    - cp -Rf $DEPLOYPATH/public/_next/static/* /tmp/ucheck_static_backup/ 2>/dev/null || true
+    - cp -Rf $DEPLOYPATH/static-fallback/* /tmp/ucheck_static_backup/ 2>/dev/null || true
     - cp -Rf $DEPLOYPATH/.next/static/* /tmp/ucheck_static_backup/ 2>/dev/null || true
-    # Step 2 — Force-clean working directory and pull latest source
-    - cd $DEPLOYPATH && git fetch origin && git reset --hard origin/main && git clean -fdx -e node_modules -e .next -e public/_next -e tmp -e server.log 2>/dev/null || true
-    # Step 3 — Kill any running Passenger lsnode process
+    - cp -Rf $DEPLOYPATH/public/_next/static/* /tmp/ucheck_static_backup/ 2>/dev/null || true
+    # Step 2 — Remove conflicting public/_next folder so Next.js build never aborts
+    - rm -rf $DEPLOYPATH/public/_next 2>/dev/null || true
+    # Step 3 — Force-clean working directory and pull latest source
+    - cd $DEPLOYPATH && git fetch origin && git reset --hard origin/main && git clean -fdx -e node_modules -e .next -e static-fallback -e tmp -e server.log 2>/dev/null || true
+    # Step 4 — Kill any running Passenger lsnode process
     - pkill -9 -f "lsnode:/home/aljadeedelectric/ucheck/" 2>/dev/null || true
     - sleep 2
-    # Step 4 — Install production dependencies
-    - cd $DEPLOYPATH && NODE_ENV=production npm install --omit=dev --ignore-scripts 2>/dev/null || npm install --production --ignore-scripts
-    # Step 5 — Clean old server output then build the optimized production bundle
-    - cd $DEPLOYPATH && NODE_ENV=production npm run build
-    # Step 6 — Restore and MERGE old static chunks (preserved for in-flight browser sessions)
-    - mkdir -p $DEPLOYPATH/public/_next/static
-    - cp -Rf /tmp/ucheck_static_backup/* $DEPLOYPATH/public/_next/static/ 2>/dev/null || true
-    # Step 7 — Overlay fresh build chunks on top (newer files overwrite, old files are kept)
-    - /bin/cp -Rf $DEPLOYPATH/.next/static/* $DEPLOYPATH/public/_next/static/ 2>/dev/null || true
+    # Step 5 — Install production dependencies (Tailwind & PostCSS are now in dependencies)
+    - cd $DEPLOYPATH && npm install --omit=dev --ignore-scripts 2>/dev/null || npm install --production --ignore-scripts
+    # Step 6 — Clean old cache and build optimized production bundle
+    - cd $DEPLOYPATH && rm -rf public/_next && npm run build
+    # Step 7 — Restore and MERGE old static chunks into static-fallback (preserved for in-flight sessions)
+    - mkdir -p $DEPLOYPATH/static-fallback
+    - cp -Rf /tmp/ucheck_static_backup/* $DEPLOYPATH/static-fallback/ 2>/dev/null || true
+    - cp -Rf $DEPLOYPATH/.next/static/* $DEPLOYPATH/static-fallback/ 2>/dev/null || true
     # Step 8 — Restart Phusion Passenger
     - mkdir -p $DEPLOYPATH/tmp
     - touch $DEPLOYPATH/tmp/restart.txt

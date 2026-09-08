@@ -78,8 +78,11 @@ app.prepare().then(() => {
         const rawRelativePath = pathname.replace('/_next/static/', '');
         const safePath = path.normalize(rawRelativePath).replace(/^(\.\.[\/\\])+/, '');
         
-        // Check primary .next/static location first, then public/_next/static fallback
+        // Check primary .next/static location first, then static-fallback, then public/_next/static fallback
         let filePath = path.join(__dirname, '.next', 'static', safePath);
+        if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
+          filePath = path.join(__dirname, 'static-fallback', safePath);
+        }
         if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
           filePath = path.join(__dirname, 'public', '_next', 'static', safePath);
         }
